@@ -259,6 +259,7 @@ class BarangController extends Controller
                 'rating_barang' => 'numeric',
                 'category_id' => 'required|in:1,2',
                 'image_barang' => 'required|image',
+                'stock_barang'=>'required|integer'
             ]);
 
             $user = Auth::user();
@@ -303,6 +304,7 @@ class BarangController extends Controller
             $barang->image_barang = $imageProductPath;
             $barang->mitra_id = $mitraId;
             $barang->status_post = $validatedData->status_post ?? 'pending';
+            $barang->stock_barang = $validatedData['stock_barang'] ?? 0;
             $barang->save();
 
             // Retrieve the category
@@ -345,6 +347,7 @@ class BarangController extends Controller
             'rating_barang' => 'nullable|numeric',
             'category_id' => 'nullable|in:1,2',
             'image_barang' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
+            'stock_barang' => 'nullable|numeric',
         ]);
 
         $barang = Barang::find($id);

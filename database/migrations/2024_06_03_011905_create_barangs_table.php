@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('category_id');
             $table->foreignId('mitra_id')->constrained('mitras')->onDelete('cascade');
             $table->string('status_post');
+            $table->integer('stock_barang')->default(0);
             $table->string('image_barang');
             $table->timestamps();
         });
