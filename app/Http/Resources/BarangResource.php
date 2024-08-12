@@ -22,6 +22,7 @@ class BarangResource extends JsonResource
             'rating_barang' => $this->rating_barang,
             'mitra_id' => $this->mitra_id,
             'status' => $this->status_post,
+            'stock' => $this->stock_barang,
             'image_barang' => $this->image_barang,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
