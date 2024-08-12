@@ -63,7 +63,6 @@ class LikeController extends Controller
         ], 200);
     }
 
-    // Favorite a product
     public function favorite(Request $request)
     {
         $request->validate([

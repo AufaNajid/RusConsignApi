@@ -89,10 +89,17 @@ class CODController extends Controller
         return response()->json(['message' => 'Status pembayaran berhasil diupdate'], 200);
     }
 
-    public function getUserCods($userId)
+    public function getUserCods($userId = null)
     {
+        // Jika $userId tidak diberikan, gunakan ID pengguna yang sedang login
+        if (!$userId) {
+            $userId = Auth::id();
+        }
+
+        // Cek apakah pengguna ada
         $user = User::findOrFail($userId);
 
+        // Ambil semua COD terkait dengan pengguna tersebut
         $cods = $user->cods()->with(['barang', 'lokasi.mitra'])->get();
 
         return response()->json([
