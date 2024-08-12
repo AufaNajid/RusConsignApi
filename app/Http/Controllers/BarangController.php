@@ -55,6 +55,7 @@ class BarangController extends Controller
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
+                'stock' => $barang->stock_barang,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -105,6 +106,7 @@ class BarangController extends Controller
             'category_nama' => $barang->category->name,
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
+            'stock' => $barang->stock_barang,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
@@ -153,6 +155,7 @@ class BarangController extends Controller
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
+                'stock' => $barang->stock_barang,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -193,6 +196,7 @@ class BarangController extends Controller
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
+                'stock' => $barang->stock_barang,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -231,6 +235,7 @@ class BarangController extends Controller
             'category_nama' => $barang->category->name,
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
+            'stock' => $barang->stock_barang,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
