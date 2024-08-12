@@ -27,14 +27,21 @@ class CODController extends Controller
             'barang_id' => 'required|exists:barangs,id',
             'lokasi_id' => 'required|exists:lokasis,id',
             'quantity' => 'required|integer',
-            'mitra_id' => 'required|exists:mitras,id', // Add this line if mitra_id is required
+            'mitra_id' => 'required|exists:mitras,id',
         ]);
 
         $barang = Barang::findOrFail($validatedData['barang_id']);
         $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
         $user = Auth::user();
 
+        if ($barang->stock < $validatedData['quantity']) {
+            return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
+        }
+
         $totalAmount = $barang->harga * $validatedData['quantity'];
+
+        $barang->stock -= $validatedData['quantity'];
+        $barang->save();
 
         $cod = Cod::create([
             'barang_id' => $validatedData['barang_id'],
@@ -43,7 +50,7 @@ class CODController extends Controller
             'status_pembayaran' => 'belum_pembayaran',
             'grand_total' => $totalAmount,
             'user_id' => $user->id,
-            'mitra_id' => $validatedData['mitra_id'], // Pass the value for mitra_id
+            'mitra_id' => $validatedData['mitra_id'],
         ]);
 
         return response()->json([
@@ -54,6 +61,7 @@ class CODController extends Controller
             'user'=> $user
         ], 201);
     }
+
 
     public function updateStatus(Request $request, $id)
     {
