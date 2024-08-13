@@ -41,7 +41,9 @@ class CODController extends Controller
         $totalAmount = $barang->harga * $validatedData['quantity'];
 
         // Update the stock
-        $barang->stock -= $validatedData['quantity'];
+        if ($barang->stock < $validatedData['quantity']) {
+            return response()->json(['message' => 'Insufficient stock available for the requested quantity'], 400);
+        }
         $barang->save();
 
         // Create COD record
