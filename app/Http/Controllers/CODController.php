@@ -34,7 +34,8 @@ class CODController extends Controller
         $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
         $user = Auth::user();
 
-        if ($barang->stock < $validatedData['quantity']) {
+        // Pastikan nama kolom yang digunakan untuk stok sesuai
+        if ($barang->stock_barang < $validatedData['quantity']) {
             return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
         }
 
@@ -65,7 +66,8 @@ class CODController extends Controller
     }
 
 
-        public function updateStatus(Request $request, $id)
+
+    public function updateStatus(Request $request, $id)
         {
             $validatedData = $request->validate([
                 'status_pembayaran' => 'required|string|in:belum_pembayaran,progres',
