@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Chat;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetMessageRequest extends FormRequest

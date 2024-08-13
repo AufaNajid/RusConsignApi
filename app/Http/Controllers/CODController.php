@@ -40,9 +40,11 @@ class CODController extends Controller
 
         $totalAmount = $barang->harga * $validatedData['quantity'];
 
+        // Update the stock
         $barang->stock -= $validatedData['quantity'];
         $barang->save();
 
+        // Create COD record
         $cod = Cod::create([
             'barang_id' => $validatedData['barang_id'],
             'lokasi_id' => $validatedData['lokasi_id'],
@@ -58,36 +60,36 @@ class CODController extends Controller
             'cod' => $cod,
             'product' => $barang,
             'lokasi' => $lokasi,
-            'user'=> $user
+            'user' => $user
         ], 201);
     }
 
 
-    public function updateStatus(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'status_pembayaran' => 'required|string|in:belum_pembayaran,progres',
-        ]);
+        public function updateStatus(Request $request, $id)
+        {
+            $validatedData = $request->validate([
+                'status_pembayaran' => 'required|string|in:belum_pembayaran,progres',
+            ]);
 
-        $cod = Cod::findOrFail($id);
+            $cod = Cod::findOrFail($id);
 
-        $cod->status_pembayaran = $validatedData['status_pembayaran'];
-        $cod->save();
+            $cod->status_pembayaran = $validatedData['status_pembayaran'];
+            $cod->save();
 
-        $user = $cod->user;
-        if ($user) {
-            $user->status_pembayaran = $validatedData['status_pembayaran'];
-            $user->save();
+            $user = $cod->user;
+            if ($user) {
+                $user->status_pembayaran = $validatedData['status_pembayaran'];
+                $user->save();
+            }
+
+            $mitra = $cod->lokasi->mitra;
+            if ($mitra) {
+                $mitra->status_pembayaran = $validatedData['status_pembayaran'];
+                $mitra->save();
+            }
+
+            return response()->json(['message' => 'Status pembayaran berhasil diupdate'], 200);
         }
-
-        $mitra = $cod->lokasi->mitra;
-        if ($mitra) {
-            $mitra->status_pembayaran = $validatedData['status_pembayaran'];
-            $mitra->save();
-        }
-
-        return response()->json(['message' => 'Status pembayaran berhasil diupdate'], 200);
-    }
 
     public function getUserCods($userId = null)
     {
