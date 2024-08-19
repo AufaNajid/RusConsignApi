@@ -27,7 +27,6 @@ class CODController extends Controller
             'barang_id' => 'required|exists:barangs,id',
             'lokasi_id' => 'required|exists:lokasis,id',
             'quantity' => 'required|integer',
-            'mitra_id' => 'required|exists:mitras,id',
         ]);
 
         $barang = Barang::findOrFail($validatedData['barang_id']);
@@ -53,7 +52,7 @@ class CODController extends Controller
             'status_pembayaran' => 'belum_pembayaran',
             'grand_total' => $totalAmount,
             'user_id' => $user->id,
-            'mitra_id' => $validatedData['mitra_id'],
+            'mitra_id' => $barang->mitra->id,
         ]);
 
         return response()->json([
@@ -95,16 +94,12 @@ class CODController extends Controller
 
     public function getUserCods($userId = null)
     {
-        // Jika $userId tidak diberikan, gunakan ID pengguna yang sedang login
         if (!$userId) {
             $userId = Auth::id();
         }
-
-        // Cek apakah pengguna ada
         $user = User::findOrFail($userId);
+        $cods = $user->cods()->with(['barang.mitra', 'lokasi',])->get();
 
-        // Ambil semua COD terkait dengan pengguna tersebut
-        $cods = $user->cods()->with(['barang', 'lokasi.mitra'])->get();
 
         return response()->json([
             'user' => $user,

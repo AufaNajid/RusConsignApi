@@ -14,12 +14,10 @@ class CategoryController extends Controller
 
     public function addCategory(Request $request)
     {
-        // Validate the incoming request data
         $validatedData = $request->validate([
-            'nama' => 'required|string|max:255', // Validation rules for the 'nama' field
+            'nama' => 'required|string|max:255',
         ]);
 
-        // Create a new category instance
         $category = new Category();
         $category->name = $validatedData['nama'];
         $category->save();

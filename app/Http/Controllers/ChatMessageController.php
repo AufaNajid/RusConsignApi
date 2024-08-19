@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewMessageSent;
 use App\Models\Chat;
+use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 

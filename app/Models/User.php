@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -35,6 +36,9 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    protected $table = 'users';
+    protected $guarded = ['id'];
     protected $hidden = [
         'password',
         'remember_token',
@@ -54,6 +58,8 @@ class User extends Authenticatable
     }
     protected $primaryKey = 'id';
 
+    const USER_TOKEN = 'userToken';
+
     public function mitra()
     {
         return $this->hasMany(Mitra::class, 'user_id', 'id');
@@ -69,7 +75,23 @@ class User extends Authenticatable
         return $this->hasMany(Cod::class);
     }
 
+    public function chat(): HasMany
+    {
+        return $this->hasMany(Chat::class,'created_by');
+    }
+
+    public function createNewToken($name, array $abilities = ['*'])
+    {
+        return $this->createToken($name, $abilities)->plainTextToken;
+    }
+
+    public function routeNotificationForOneSignal() : array{
+        return ['tags'=>['key'=>'userId','relation'=>'=', 'value'=>(string)(1)]];
+    }
 
 
+    public function sendNowMessageNotification(array $data) : void {
+        $this->notify(new MessageSent($data));
+    }
 
 }

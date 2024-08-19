@@ -9,7 +9,9 @@ class LokasiController extends Controller
 {
     public function index()
     {
+        $lokasi = Lokasi::all();
 
+        return response()->json($lokasi);
     }
 
     public function lokasi(Request $request)
@@ -19,7 +21,6 @@ class LokasiController extends Controller
             'nama_lokasi' => 'required|string|max:255',
             'desc_lokasi' => 'required|string',
             'gambar_lokasi' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'mitra_id' => 'required|exists:mitras,id', // Ensure mitra_id is provided and exists in the mitras table
         ]);
 
         // Handle the image upload
@@ -33,7 +34,6 @@ class LokasiController extends Controller
             $lokasi->nama_lokasi = $validatedData['nama_lokasi'];
             $lokasi->desc_lokasi = $validatedData['desc_lokasi'];
             $lokasi->gambar_lokasi = '/storage/' . $imagePath;
-            $lokasi->mitra_id = $validatedData['mitra_id']; // Set the mitra_id
             $lokasi->save();
 
             return response()->json(['message' => 'Location added successfully'], 200);

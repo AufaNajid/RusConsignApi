@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\JasaController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MitraController;
@@ -77,6 +79,9 @@ Route::group([
     Route::post('/profiles/image', [ProfileController::class, 'postImageProfile']);
     Route::post('/profile/image/{id}', [ProfileController::class, 'editImageProfile']);
     Route::delete('/profiles/image/{id}', [ProfileController::class, 'destroyImageProfile']);
+
+    Route::apiResource('chat', ChatController::class)->only(['index', 'store', 'show']);
+    Route::apiResource('chat_message', ChatMessageController::class)->only(['index', 'store']);
 }
 );
 
