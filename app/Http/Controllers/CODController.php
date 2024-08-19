@@ -153,13 +153,34 @@ class CODController extends Controller
         return response()->json(['message' => 'Status pembayaran berhasil diperbarui menjadi selesai'], 200);
     }
 
+    public function cancelOrder($id)
+    {
+        $cod = Cod::findOrFail($id);
+
+        // Cek apakah status pembayaran masih 'belum_pembayaran'
+        if ($cod->status_pembayaran !== 'belum_pembayaran') {
+            return response()->json(['message' => 'Pesanan tidak dapat dibatalkan karena status pembayaran bukan belum pembayaran'], 400);
+        }
+
+        // Kembalikan stok barang
+        $barang = $cod->barang;
+        $barang->stock_barang += $cod->quantity;
+        $barang->save();
+
+        // Update status menjadi 'batal_pesanan'
+        $cod->status_pembayaran = 'batal_pesanan';
+        $cod->save();
+
+        return response()->json(['message' => 'Pesanan berhasil dibatalkan dan stok barang telah dikembalikan'], 200);
+    }
+
     public function getCodsByStatus($role, $status, $id)
     {
         if (!in_array($role, ['user', 'mitra'])) {
             return response()->json(['message' => 'Role tidak valid'], 400);
         }
 
-        if (!in_array($status, ['belum_pembayaran', 'progres', 'selesai'])) {
+        if (!in_array($status, ['belum_pembayaran', 'progres', 'selesai', 'batal_pesanan'])) {
             return response()->json(['message' => 'Status pembayaran tidak valid'], 400);
         }
 

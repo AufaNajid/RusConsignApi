@@ -52,6 +52,7 @@ Route::group([
     Route::get('/mitra/{mitra_id}/cods', [\App\Http\Controllers\CODController::class, 'getMitraCods']);
     Route::put('/cod/{id}/complete', [\App\Http\Controllers\CODController::class, 'updateStatusToCompleted']);
     Route::get('/cods/{role}/{status}/{id}', [\App\Http\Controllers\CODController::class, 'getCodsByStatus']);
+    Route::delete('/cod/cancel/{id}', [\App\Http\Controllers\CODController::class, 'cancelOrder']);
 
 
     Route::get('/cart', [CartController::class, 'index']);
@@ -107,7 +108,7 @@ Route::get("index",[AuthController::class,"index"]);
 
  // Routes for AuthmitraController
 Route::get('lokasi', [\App\Http\Controllers\LokasiController::class, 'index']);
-Route::get('/lokasi/{id}', [LokasiController::class, 'show']);
+Route::get('/lokasi/{id}', [\App\Http\Controllers\LokasiController::class, 'show']);
 Route::post('add-lokasi', [\App\Http\Controllers\LokasiController::class, 'lokasi']);
 
 
