@@ -107,6 +107,7 @@ Route::get("index",[AuthController::class,"index"]);
 
  // Routes for AuthmitraController
 Route::get('lokasi', [\App\Http\Controllers\LokasiController::class, 'index']);
+Route::get('/lokasi/{id}', [LokasiController::class, 'show']);
 Route::post('add-lokasi', [\App\Http\Controllers\LokasiController::class, 'lokasi']);
 
 

@@ -14,6 +14,14 @@ class LokasiController extends Controller
         return response()->json($lokasi);
     }
 
+    public function show($id)
+    {
+        // Mencari lokasi berdasarkan ID
+        $lokasi = Lokasi::findOrFail($id);
+
+        // Mengembalikan data lokasi sebagai JSON
+        return response()->json($lokasi);
+    }
     public function lokasi(Request $request)
     {
         // Validate the request data
