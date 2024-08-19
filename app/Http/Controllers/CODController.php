@@ -166,12 +166,12 @@ class CODController extends Controller
         if ($role === 'user') {
             $cods = Cod::where('status_pembayaran', $status)
                 ->where('user_id', $id)
-                ->with(['barang', 'lokasi.mitra', 'user'])
+                ->with(['barang', 'lokasi','mitra', 'user'])
                 ->get();
         } else {
             $cods = Cod::where('status_pembayaran', $status)
                 ->where('mitra_id', $id)
-                ->with(['barang', 'lokasi.mitra', 'user'])
+                ->with(['barang', 'lokasi','mitra', 'user'])
                 ->get();
         }
 
