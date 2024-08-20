@@ -19,7 +19,7 @@ class MitraResource extends JsonResource
             'image profile'=>$this->image_profile,
             'nama' => $this->nama_lengkap,
             'nama toko'=> $this->nama_toko,
-            'bio_deskripsi' => $this->user->bio_desc ?? null,
+            'bio_deskripsi' => $this->user->bio_desc ?? "",
             'nis' => $this->nis,
             'nomor' => $this->no_dompet_digital,
             'image' => $this->image_id_card,
