@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GetChatRequest;
 use App\Http\Requests\StoreChatRequest;
-use App\Models\Chat;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Chat;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ChatController extends Controller
 {

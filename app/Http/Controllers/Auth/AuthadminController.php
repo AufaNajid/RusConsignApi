@@ -70,37 +70,5 @@ class AuthadminController extends Controller
 //    }
 
 
-    public function accept(Request $request, $id)
-    {
-        $mitra = Mitra::find($id);
-        if (!$mitra) {
-            return response()->json(['message' => 'Mitra not found'], 404);
-        }
-
-        // Change status to "accepted"
-        $mitra->status = 'accepted';
-        if ($mitra->save()) {
-            return new MitraResource($mitra);
-        } else {
-            return response()->json(['message' => 'Failed to accept mitra'], 500);
-        }
-    }
-
-    public function reject(Request $request, $id)
-    {
-        $mitra = Mitra::find($id);
-        if (!$mitra) {
-            return response()->json(['message' => 'Mitra not found'], 404);
-        }
-
-        // Change status to "rejected"
-        $mitra->status = 'rejected';
-        if ($mitra->save()) {
-            return new MitraResource($mitra);
-        } else {
-            return response()->json(['message' => 'Failed to reject mitra'], 500);
-        }
-    }
-
 }
 

@@ -81,6 +81,9 @@ Route::group([
     Route::post('/profile/image/{id}', [ProfileController::class, 'editImageProfile']);
     Route::delete('/profiles/image/{id}', [ProfileController::class, 'destroyImageProfile']);
 
+    Route::get('/komentar', [\App\Http\Controllers\ReviewController::class, 'index']);
+    Route::post('/add-komentar', [\App\Http\Controllers\ReviewController::class, 'store']);
+
     Route::apiResource('chat', ChatController::class)->only(['index', 'store', 'show']);
     Route::apiResource('chat_message', ChatMessageController::class)->only(['index', 'store']);
     Route::apiResource('user', UserController::class)->only(['index']);

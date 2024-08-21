@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
 
+
 class MessageSent extends Notification
 {
     use Queueable;

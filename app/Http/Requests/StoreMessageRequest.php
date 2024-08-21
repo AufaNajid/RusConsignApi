@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Chat;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Chat;
 
 class StoreMessageRequest extends FormRequest
 {

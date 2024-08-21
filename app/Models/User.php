@@ -3,14 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\MessageSent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Laravel\Sanctum\PersonalAccessToken;
-use Symfony\Component\HttpKernel\Profiler\Profile;
+use App\Models\Chat;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -94,4 +93,8 @@ class User extends Authenticatable
         $this->notify(new MessageSent($data));
     }
 
+    public function komentars()
+    {
+        return $this->hasMany(Komentar::class);
+    }
 }

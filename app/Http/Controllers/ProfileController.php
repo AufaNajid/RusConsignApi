@@ -59,62 +59,62 @@ class ProfileController extends Controller
     }
 
 
-    public function editProfile(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
+        public function editProfile(Request $request)
+        {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'bio_desc' => 'sometimes|string',
-            'image_profile' => 'sometimes|image',
-            'nama_toko' => 'sometimes|string|max:255'
-        ]);
+            $validatedData = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'bio_desc' => 'sometimes|string',
+                'image_profile' => 'sometimes|image',
+                'nama_toko' => 'sometimes|string|max:255'
+            ]);
 
-        // Update user data
-        if (isset($validatedData['name'])) {
-            $user->name = $validatedData['name'];
-        }
-        if (isset($validatedData['bio_desc'])) {
-            $user->bio_desc = $validatedData['bio_desc'];
-        }
+            // Update user data
+            if (isset($validatedData['name'])) {
+                $user->name = $validatedData['name'];
+            }
+            if (isset($validatedData['bio_desc'])) {
+                $user->bio_desc = $validatedData['bio_desc'];
+            }
 
-        // Handle profile image update
-        if (isset($validatedData['image_profile'])) {
-            $profileImage = $user->profileImages()->first(); // Get the first profile image
-            if ($profileImage) {
-                // Delete old image if exists
-                if (Storage::exists($profileImage->image_profile)) {
-                    Storage::delete($profileImage->image_profile);
+            // Handle profile image update
+            if (isset($validatedData['image_profile'])) {
+                $profileImage = $user->profileImages()->first(); // Get the first profile image
+                if ($profileImage) {
+                    // Delete old image if exists
+                    if (Storage::exists($profileImage->image_profile)) {
+                        Storage::delete($profileImage->image_profile);
+                    }
+                    // Store new image
+                    $imagePath = $request->file('image_profile')->store('public/profiles');
+                    $profileImage->image_profile = Storage::url($imagePath);
+                    $profileImage->save();
+                } else {
+                    // Create new profile image if none exists
+                    $imagePath = $request->file('image_profile')->store('public/profiles');
+                    $profileImage = $user->profileImages()->create([
+                        'image_profile' => Storage::url($imagePath),
+                        'mitra_id' => null,
+                    ]);
                 }
-                // Store new image
-                $imagePath = $request->file('image_profile')->store('public/profiles');
-                $profileImage->image_profile = Storage::url($imagePath);
-                $profileImage->save();
-            } else {
-                // Create new profile image if none exists
-                $imagePath = $request->file('image_profile')->store('public/profiles');
-                $profileImage = $user->profileImages()->create([
-                    'image_profile' => Storage::url($imagePath),
-                    'mitra_id' => null,
-                ]);
+                // Optionally update user with the new image
+                $user->image_profiles = $profileImage->image_profile; // Update this field
             }
-            // Optionally update user with the new image
-            $user->image_profiles = $profileImage->image_profile; // Update this field
-        }
 
-        // Handle 'nama_toko' update
-        if (isset($validatedData['nama_toko'])) {
-            $profileImage = $user->profileImages()->first(); // Get the first profile image
-            if ($profileImage && $profileImage->mitra) {
-                $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
-                $profileImage->mitra->save();
-            } else {
-                // Optionally handle the case where 'mitra' is null
+            // Handle 'nama_toko' update
+            if (isset($validatedData['nama_toko'])) {
+                $profileImage = $user->profileImages()->first(); // Get the first profile image
+                if ($profileImage && $profileImage->mitra) {
+                    $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
+                    $profileImage->mitra->save();
+                } else {
+                    // Optionally handle the case where 'mitra' is null
+                }
             }
-        }
 
         // Save user data
         $user->save();
