@@ -36,6 +36,8 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'forgot']);
 Route::post('reset-password', [ResetPasswordController::class, 'reset']);
 Route::post('send-otp', [OTPController::class, 'sendOTP']);
 Route::post('verify-otp', [OTPController::class, 'verifyOTP']);
+Route::post('registeradmin',[AuthadminController::class,'registeradmin']);
+Route::post('loginadmin',[AuthadminController::class,'loginadmin']);
 
 Route::group([
     "middleware" => ["auth:sanctum"]
@@ -131,14 +133,12 @@ Route::post('/registermitra', [AuthmitraController::class, 'registermitra'])->mi
 Route::put('mitra/{id}/accept', [AuthadminController::class, 'acceptMitra'])->middleware('auth:sanctum');
 
 Route::delete('mitra/{id}/reject', [AuthadminController::class, 'rejectMitra']);
-Route::post('registeradmin',[AuthadminController::class,'registeradmin']);
-Route::post('loginadmin',[AuthadminController::class,'loginadmin']);
+
 Route::post('/mitras/{id}/tambahpengikut', [AuthmitraController::class, 'tambahpengikut']);
 Route::post('/mitras/{id}/tambahproduct', [AuthmitraController::class, 'tambahproduct']);
 Route::get('storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
 
-    // Periksa apakah file ada
     if (!Storage::exists($path)) {
         abort(404);
     }
