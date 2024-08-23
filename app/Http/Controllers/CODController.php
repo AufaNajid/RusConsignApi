@@ -162,12 +162,10 @@ class CODController extends Controller
             return response()->json(['message' => 'Pesanan tidak dapat dibatalkan karena status pembayaran bukan belum pembayaran'], 400);
         }
 
-        // Kembalikan stok barang
         $barang = $cod->barang;
         $barang->stock_barang += $cod->quantity;
         $barang->save();
 
-        // Update status menjadi 'batal_pesanan'
         $cod->status_pembayaran = 'batal_pesanan';
         $cod->save();
 
@@ -202,4 +200,6 @@ class CODController extends Controller
             'cods' => $cods,
         ], 200);
     }
+
+
 }

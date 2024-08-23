@@ -12,7 +12,10 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = Cart::where('user_id', Auth::id())->with('barang')->get();
-        return response()->json($cartItems, 200);
+        return response()->json([
+            "message" => "Data Cart berhasil ditemukan",
+            "cart" => $cartItems,
+        ], 200);
     }
 
     public function store(Request $request)
