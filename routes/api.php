@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Storage;
 //     });
 // });
 
-Route::get('/users', [AuthController::class, 'index']);
+
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
@@ -42,6 +42,10 @@ Route::post('loginadmin',[AuthadminController::class,'loginadmin']);
 Route::group([
     "middleware" => ["auth:sanctum"]
 ], function(){
+
+    Route::get('/users', [AuthController::class, 'index']);
+    Route::get('/mitra',[AuthmitraController::class, 'index']);
+    Route::get('barang', [\App\Http\Controllers\BarangController::class, 'index']);
 
     Route:: get("profile",[AuthController::class,"profile"]);
     Route::get("logout",[AuthController::class,"logout"]);
@@ -101,7 +105,7 @@ Route::get('/accepted-barangs', [BarangController::class, 'getAcceptedBarangs'])
 Route::get('/barangs/search', [BarangController::class, 'searchAcceptedBarangs']);
 
 Route::get('dataprofile', [ProfileController::class, 'dataprofile']);
-Route::get('barang', [\App\Http\Controllers\BarangController::class, 'index']);
+
 
 
 Route::post('tambahjasa', [ProfileController::class, 'tambahjasa']);
@@ -122,7 +126,7 @@ Route::post('add-lokasi', [\App\Http\Controllers\LokasiController::class, 'lokas
 Route::put('accept/{id}', [AuthmitraController::class, 'accept']);
 Route::get("mitra/show/{id}", [AuthmitraController::class, "show"])->middleware('auth:sanctum');
 Route::delete('reject/{id}', [AuthmitraController::class, 'reject'])->middleware('auth:sanctum');
-Route::get('/mitra',[AuthmitraController::class, 'index']);
+
 Route::put('/mitras/{id}', [AuthmitraController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/mitras/{id}', [AuthmitraController::class, 'destroy'])->middleware('auth:sanctum');
 

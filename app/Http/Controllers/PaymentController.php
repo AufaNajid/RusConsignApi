@@ -23,21 +23,17 @@ class PaymentController extends Controller
     public function createInvoice(Request $request)
     {
         try {
-            // Validate the request data
             $validatedData = $request->validate([
                 'barang_id' => 'required|integer|exists:barangs,id',
                 'quantity' => 'required|integer|min:1',
             ]);
 
-            // Retrieve the authenticated user and the requested barang
             $barang = Barang::findOrFail($validatedData['barang_id']);
             $user = Auth::user();
 
-            // Calculate the total amount
             $totalAmount = $barang->harga * $validatedData['quantity'];
             $no_transaction = 'Inv-' . uniqid();
 
-            // Create an invoice request
             $createdInvoice = [
                 'external_id' => $no_transaction,
                 'amount' => $totalAmount,
