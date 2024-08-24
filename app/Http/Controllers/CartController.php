@@ -39,7 +39,7 @@ class CartController extends Controller
             ]
         );
 
-        $cartItem->load('barang');
+        $cartItem->load('barang.mitra');
 
         return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
     }
@@ -63,7 +63,7 @@ class CartController extends Controller
         $cartItem->total_price = $totalPrice;
         $cartItem->save();
 
-        $cartItem->load('barang');
+        $cartItem->load('barang.mitra');
 
         return response()->json(['message' => 'Cart item updated', 'cartItem' => $cartItem], 200);
     }
