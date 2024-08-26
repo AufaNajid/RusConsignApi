@@ -59,6 +59,7 @@ Route::group([
     Route::put('/cod/{id}/complete', [\App\Http\Controllers\CODController::class, 'updateStatusToCompleted']);
     Route::get('/cods/{role}/{status}/{id}', [\App\Http\Controllers\CODController::class, 'getCodsByStatus']);
     Route::delete('/cod/cancel/{id}', [\App\Http\Controllers\CODController::class, 'cancelOrder']);
+    Route::get('/cods/status/{status}', [\App\Http\Controllers\CODController::class, 'getAllByStatus']);
 
 
     Route::get('/cart', [CartController::class, 'index']);
