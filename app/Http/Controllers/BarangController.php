@@ -6,10 +6,12 @@ use App\Http\Resources\BarangResource;
 use App\Http\Resources\MitraResource;
 use App\Models\Barang;
 use App\Models\Category;
+use App\Models\Komentar;
 use App\Models\Mitra;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
