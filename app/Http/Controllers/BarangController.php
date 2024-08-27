@@ -56,15 +56,6 @@ class BarangController extends Controller
                 'quantity' => $barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
-                'mitra' => [
-                    'id' => $barang->mitra->id,
-                    'nama_toko' => $barang->mitra->nama_toko,
-                    'nama_lengkap' => $barang->mitra->nama_lengkap,
-                    'jumlah_product' => $barang->mitra->jumlah_product,
-                    'jumlah_jasa' => $barang->mitra->jumlah_jasa,
-                    'pengikut' => $barang->mitra->pengikut,
-                    'penilaian' => $barang->mitra->penilaian,
-                ],
             ];
         }
 
