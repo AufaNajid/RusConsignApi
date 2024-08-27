@@ -44,7 +44,7 @@ class BarangController extends Controller
         $barangData = [];
         foreach ($barangs as $barang) {
             $barangData[] = [
-                'id' => $barang->id,
+                'id_barang' => $barang->id,
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
