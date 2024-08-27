@@ -22,7 +22,9 @@ class Barang extends Model
         'category_id',
         'mitra_id',
         'image_barang',
-        'status_post'
+        'status_post',
+        'quantity',
+        'stock_barang'
     ];
 
     /**
