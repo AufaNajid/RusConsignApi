@@ -56,6 +56,7 @@ class BarangController extends Controller
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
+                'quantity'=>$barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -107,6 +108,7 @@ class BarangController extends Controller
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
             'stock' => $barang->stock_barang,
+            'quantity'=>$barang->quantity,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
@@ -156,6 +158,7 @@ class BarangController extends Controller
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'stock' => $barang->stock_barang,
+                'quantity'=>$barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -197,6 +200,7 @@ class BarangController extends Controller
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
+                'quantity'=>$barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -236,6 +240,7 @@ class BarangController extends Controller
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
             'stock' => $barang->stock_barang,
+            'quantity'=>$barang->quantity,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
@@ -310,6 +315,7 @@ class BarangController extends Controller
             $barang->mitra_id = $mitraId;
             $barang->status_post = $validatedData->status_post ?? 'pending';
             $barang->stock_barang = $validatedData['stock_barang'] ?? 0;
+            $barang->quantity = 1;
             $barang->save();
 
             // Retrieve the category

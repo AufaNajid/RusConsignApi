@@ -45,4 +45,9 @@ class Barang extends Model
     {
         return $this->hasMany(Komentar::class);
     }
+
+    public  function  cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
 }

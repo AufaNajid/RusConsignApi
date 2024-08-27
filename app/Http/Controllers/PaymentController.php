@@ -71,21 +71,25 @@ class PaymentController extends Controller
         }
     }
 
-//    public function notificationCallback(Request $request)
-//    {
-//        $getToken = $request->headers->get('x-callback-token');
-//        $callbackToken = env('XENDIT_CALLBACK_TOKEN');
-//
-//        try{
-//            return response()->json([
-//                'status' => 'check token',
-//                'massage' => 'check token from xendit',
-//                'token' => $getToken,
-//            ],Resposnse::HTTP_OK);
-//        }catch (
-//
-//        )
-//    }
+    public function webhook(Request $request)
+    {
+        try {
+            $getInvoice = Invoice::retrieve($request->id);
 
+            $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
+
+            if ($payment->status != 'pending') {
+                return response()->json([
+                    "data" => "Payment has already been processed"
+                ]);
+            }
+            $payment->status = strtolower($getInvoice['status']);
+            $payment->save();
+
+            return response()->json(["data" => "Success"]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
 

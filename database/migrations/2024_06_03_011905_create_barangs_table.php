@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('mitra_id')->constrained('mitras')->onDelete('cascade');
             $table->string('status_post');
             $table->integer('stock_barang')->default(0);
+            $table->integer('quantity')->default(1);
             $table->string('image_barang');
             $table->timestamps();
         });
