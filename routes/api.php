@@ -107,6 +107,8 @@ Route::put('publish/{id}', [BarangController::class, 'publish']);
 Route::put('unpublish/{id}', [BarangController::class, 'unpublish']);
 Route::get('/accepted-barangs', [BarangController::class, 'getAcceptedBarangs']);
 Route::get('/barangs/search', [BarangController::class, 'searchAcceptedBarangs']);
+Route::get('/filter-products-by-mitra', [BarangController::class, 'filterProductsByMitra']);
+
 
 Route::get('dataprofile', [ProfileController::class, 'dataprofile']);
 

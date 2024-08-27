@@ -16,6 +16,64 @@ use Illuminate\Support\Facades\Storage;
 class BarangController extends Controller
 {
 
+    public function filterProductsByMitra(Request $request)
+    {
+        $request->validate([
+            'mitra_id' => 'required|integer|exists:mitras,id',
+            'category_id' => 'nullable|integer|exists:categories,id', // Optional, to filter by category
+        ]);
+
+        $mitraId = $request->input('mitra_id');
+        $categoryId = $request->input('category_id');
+
+        $query = Barang::where('mitra_id', $mitraId)
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian');
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $barangs = $query->get();
+
+        if ($barangs->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada barang yang ditemukan untuk mitra ini'], 404);
+        }
+
+        $barangData = [];
+        foreach ($barangs as $barang) {
+            $barangData[] = [
+                'id' => $barang->id,
+                'nama_barang' => $barang->nama_barang,
+                'deskripsi' => $barang->deskripsi,
+                'harga' => $barang->harga,
+                'rating_barang' => $barang->rating_barang,
+                'category_id' => $barang->category->id,
+                'category_nama' => $barang->category->name,
+                'image_barang' => $barang->image_barang,
+                'stock' => $barang->stock_barang,
+                'quantity' => $barang->quantity,
+                'created_at' => $barang->created_at,
+                'updated_at' => $barang->updated_at,
+                'mitra' => [
+                    'id' => $barang->mitra->id,
+                    'nama_toko' => $barang->mitra->nama_toko,
+                    'nama_lengkap' => $barang->mitra->nama_lengkap,
+                    'jumlah_product' => $barang->mitra->jumlah_product,
+                    'jumlah_jasa' => $barang->mitra->jumlah_jasa,
+                    'pengikut' => $barang->mitra->pengikut,
+                    'penilaian' => $barang->mitra->penilaian,
+                ],
+            ];
+        }
+
+        // Return the response
+        return response()->json([
+            'message' => 'Data barang berhasil ditemukan',
+            'barangs' => $barangData,
+        ], 200);
+    }
+
+
     public function searchAcceptedBarangs(Request $request)
     {
         $searchTerm = $request->query('q');
