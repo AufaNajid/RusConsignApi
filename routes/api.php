@@ -46,6 +46,8 @@ Route::group([
     Route::get('/users', [AuthController::class, 'index']);
     Route::get('/mitra',[AuthmitraController::class, 'index']);
     Route::get('barang', [\App\Http\Controllers\BarangController::class, 'index']);
+    Route::get('/barangs/other-mitra', [BarangController::class, 'getAcceptedBarangsFromOtherMitra']);
+
 
     Route:: get("profile",[AuthController::class,"profile"]);
     Route::get("logout",[AuthController::class,"logout"]);

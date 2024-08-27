@@ -7,13 +7,10 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Xendit\Configuration;
-use Xendit\Invoice\CreateInvoiceRequest;
-use Xendit\Invoice\Invoice;
-use Xendit\Invoice\InvoiceApi;
 use App\Models\User;
-
+use Xendit\Invoice\InvoiceApi;
+use Xendit\Xendit;
 
 class PaymentController extends Controller
 {
@@ -24,133 +21,88 @@ class PaymentController extends Controller
 
     public function createInvoice(Request $request)
     {
-        // Validasi input dengan validate
-        $validatedData = $request->validate([
-            'barang_id' => 'required|integer|exists:barangs,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        // Ambil data dari validated request
-        $barang_id = $validatedData['barang_id'];
-        $quantity = $validatedData['quantity'];
-
-        // Ambil data barang dari database
-        $barang = \App\Models\Barang::find($barang_id);
-        if (!$barang) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Barang not found'
-            ], 404);
-        }
-
-        // Hitung total harga
-        $totalAmount = $barang->price * $quantity;
-
-        // Konfigurasi Xendit
-        Xendit::setApiKey(env('XENDIT_API_KEY'));
-
-        // Persiapkan data untuk invoice
-        $invoiceData = [
-            "external_id" => (string) Str::uuid(),
-            'amount' => $totalAmount,
-            'description' => 'Invoice for Barang ID ' . $barang_id,
-            'invoice_duration' => 3600, // Durasi invoice dalam detik
-            'items' => [
-                [
-                    'name' => $barang->name,
-                    'price' => $barang->price,
-                    'quantity' => $quantity,
-                    'total' => $totalAmount,
-                ]
-            ],
-        ];
-
         try {
-            // Buat invoice dengan Xendit
-            $createInvoice = Invoice::create($invoiceData);
+            $validatedData = $request->validate([
+                'barang_id' => 'required|integer|exists:barangs,id',
+                'quantity' => 'required|integer|min:1',
+            ]);
 
-            return response()->json([
-                'status' => 'success',
-                'invoice_url' => $createInvoice->invoice_url,
-                'message' => 'Invoice created successfully'
-            ], 201);
+            $barang = Barang::findOrFail($validatedData['barang_id']);
+            $user = Auth::user();
+
+            $totalAmount = $barang->harga * $validatedData['quantity'];
+            $no_transaction = 'Inv-' . uniqid();
+
+            $createdInvoice = [
+                'external_id' => $no_transaction,
+                'amount' => $totalAmount,
+                'payer_email' => $user->email,
+                'description' => 'Invoice for user ' . $user->name,
+            ];
+
+            // Generate the invoice using the API instance
+            $apiInstance = new InvoiceApi();
+            $generateInvoice = $apiInstance->createInvoice($createdInvoice);
+
+            // Check if the response has the necessary property
+            if (!isset($generateInvoice['invoice_url'])) {
+                throw new \Exception('Invoice URL not found in the response');
+            }
+
+            // Save the payment order to the database
+            $order = new Payment([
+                'barang_id' => $validatedData['barang_id'],
+                'user_id' => $user->id,
+                'no_transaction' => $no_transaction,
+                'external_id' => $no_transaction,
+                'name_barang' => $barang->nama_barang,
+                'quantity' => $validatedData['quantity'],
+                'harga_barang' => $barang->harga,
+                'grand_total' => $totalAmount,
+                'invoice_url' => $generateInvoice['invoice_url'],
+                'status' => 'progres',
+            ]);
+            $order->save();
+
+            return response()->json($generateInvoice, 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
-
-//    public function createInvoice(Request $request)
+//    public function webhook(Request $request)
 //    {
 //        try {
-//            $validatedData = $request->validate([
-//                'barang_id' => 'required|integer|exists:barangs,id',
-//                'quantity' => 'required|integer|min:1',
-//            ]);
+//            // Retrieve the invoice using the ID from the webhook request
+//            $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
 //
-//                $barang = Barang::findOrFail($validatedData['barang_id']);
-//            $user = Auth::user();
+//            // Find the corresponding payment record from the database
+//            $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
 //
-//            $totalAmount = $barang->harga * $validatedData['quantity'];
-//            $no_transaction = 'Inv-' . uniqid();
-//
-//            $createdInvoice = [
-//                'external_id' => $no_transaction,
-//                'amount' => $totalAmount,
-//                'payer_email' => $user->email,
-//                'description' => 'Invoice for user ' . $user->name,
-//            ];
-//
-//            // Generate the invoice using the API instance
-//            $apiInstance = new InvoiceApi();
-//            $generateInvoice = $apiInstance->createInvoice($createdInvoice);
-//
-//            // Check if the response has the necessary property
-//            if (!isset($generateInvoice['invoice_url'])) {
-//                throw new \Exception('Invoice URL not found in the response');
+//            // Check if the payment status is already 'settled'
+//            if ($payment->status == 'settled') {
+//                return response()->json([
+//                    "data" => "Payment has already been processed"
+//                ], 200); // Return 200 OK if payment is already processed
 //            }
 //
-//            // Save the payment order to the database
-//            $order = new Payment([
-//                'barang_id' => $validatedData['barang_id'],
-//                'user_id' => $user->id,
-//                'no_transaction' => $no_transaction,
-//                'external_id' => $no_transaction,
-//                'name_barang' => $barang->nama_barang,
-//                'quantity' => $validatedData['quantity'],
-//                'harga_barang' => $barang->harga,
-//                'grand_total' => $totalAmount,
-//                'invoice_url' => $generateInvoice['invoice_url'],
-//                'status' => 'pending',
-//            ]);
-//            $order->save();
+//            // Update the payment status based on the invoice status
+//            $payment->status = strtolower($getInvoice['status']);
+//            $payment->save();
 //
-//            return response()->json($generateInvoice, 201);
+//            // Return a success response
+//            return response()->json([
+//                "data" => "Payment status updated successfully"
+//            ], 200);
+//
 //        } catch (\Exception $e) {
-//            return response()->json(['error' => $e->getMessage()], 500);
+//            // Handle errors and return a response with error message
+//            return response()->json([
+//                "error" => $e->getMessage()
+//            ], 500);
 //        }
 //    }
 
-    public function webhook(Request $request)
-    {
-        $getInvoice = \Xendit\Invoice::retrieve($request->id);
-
-        $payment = Payment::where('external_id',$request->external_id)->firstOrFail();
-
-        if ($payment->status == 'settled'){
-            return response()->json([
-                "data" => "Payment has been already processed"
-            ]);
-
-            $payment->status = strtolower($getInvoice['status']);
-            $payment->save();
-            return response()->json([]);
-        }
-
-    }
 
 }
 

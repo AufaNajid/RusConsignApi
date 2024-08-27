@@ -78,56 +78,70 @@ class BarangController extends Controller
     }
 
     public function getAcceptedBarangs(Request $request)
-{
+    {
+        $categoryId = $request->query('category_id');
 
-    $categoryId = $request->query('category_id');
+        $query = Barang::where('status_post', 'publish')
+            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian');
 
-    $query = Barang::where('status_post', 'publish')
-        ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian');
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
 
-    if ($categoryId) {
-        $query->where('category_id', $categoryId);
+        $barangs = $query->get();
+
+        if ($barangs->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada barang yang diterima ditemukan'], 404);
+        }
+
+        $barangData = [];
+        foreach ($barangs as $barang) {
+            // Menghitung rata-rata rating untuk setiap barang
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barang->id)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avg = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
+            $barangData[] = [
+                'id' => $barang->id,
+                'nama_barang' => $barang->nama_barang,
+                'deskripsi' => $barang->deskripsi,
+                'harga' => $barang->harga,
+                'rating_barang' => $avg, // Menggunakan avg dari perhitungan
+                'category_id' => $barang->category->id,
+                'category_nama' => $barang->category->name,
+                'image_barang' => $barang->image_barang,
+                'status' => $barang->status_post,
+                'stock' => $barang->stock_barang,
+                'quantity' => $barang->quantity,
+                'created_at' => $barang->created_at,
+                'updated_at' => $barang->updated_at,
+                'mitra' => [
+                    'id' => $barang->mitra->id,
+                    'nama_toko' => $barang->mitra->nama_toko,
+                    'nama_lengkap' => $barang->mitra->nama_lengkap,
+                    'jumlah_product' => $barang->mitra->jumlah_product,
+                    'jumlah_jasa' => $barang->mitra->jumlah_jasa,
+                    'pengikut' => $barang->mitra->pengikut,
+                    'penilaian' => $barang->mitra->penilaian,
+                ],
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Data barang yang diterima berhasil ditemukan',
+            'barangs' => $barangData,
+        ], 200);
     }
 
-    $barangs = $query->get();
-
-    if ($barangs->isEmpty()) {
-        return response()->json(['message' => 'Tidak ada barang yang diterima ditemukan'], 404);
-    }
-
-    $barangData = [];
-    foreach ($barangs as $barang) {
-        $barangData[] = [
-            'id' => $barang->id,
-            'nama_barang' => $barang->nama_barang,
-            'deskripsi' => $barang->deskripsi,
-            'harga' => $barang->harga,
-            'rating_barang' => $barang->rating_barang,
-            'category_id' => $barang->category->id,
-            'category_nama' => $barang->category->name,
-            'image_barang' => $barang->image_barang,
-            'status' => $barang->status_post,
-            'stock' => $barang->stock_barang,
-            'quantity'=>$barang->quantity,
-            'created_at' => $barang->created_at,
-            'updated_at' => $barang->updated_at,
-            'mitra' => [
-                'id' => $barang->mitra->id,
-                'nama_toko'=>$barang->mitra->nama_toko,
-                'nama_lengkap' => $barang->mitra->nama_lengkap,
-                'jumlah_product' => $barang->mitra->jumlah_product,
-                'jumlah_jasa' => $barang->mitra->jumlah_jasa,
-                'pengikut' => $barang->mitra->pengikut,
-                'penilaian' => $barang->mitra->penilaian,
-            ],
-        ];
-    }
-
-    return response()->json([
-        'message' => 'Data barang yang diterima berhasil ditemukan',
-        'barangs' => $barangData,
-    ], 200);
-}
 
 
     public function filterProductsByCategory(Request $request)
@@ -189,18 +203,32 @@ class BarangController extends Controller
 
         $barangData = [];
         foreach ($barangs as $barang) {
+            // Menghitung rata-rata rating untuk setiap barang
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barang->id)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avg = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
             $barangData[] = [
                 'id' => $barang->id,
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
-                'rating_barang' => $barang->rating_barang,
+                'rating_barang' => $avg, // Menggunakan avg dari perhitungan
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
-                'quantity'=>$barang->quantity,
+                'quantity' => $barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -229,18 +257,32 @@ class BarangController extends Controller
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
         }
 
+        // Menghitung rata-rata rating untuk barang yang ditampilkan
+        $rate = Komentar::select(
+            DB::raw('count(1) as total'),
+            'rate'
+        )
+            ->where('barang_id', $barang->id)
+            ->groupBy('rate')
+            ->get();
+
+        $total = $rate->sum('total');
+        $avg = $rate->reduce(function ($carry, $item) {
+                return $carry + ($item->total * $item->rate);
+            }, 0) / ($total ?: 1);
+
         $barangData = [
             'id' => $barang->id,
             'nama_barang' => $barang->nama_barang,
             'deskripsi' => $barang->deskripsi,
             'harga' => $barang->harga,
-            'rating_barang' => $barang->rating_barang,
+            'rating_barang' => $avg, // Menggunakan avg dari perhitungan
             'category_id' => $barang->category->id,
             'category_nama' => $barang->category->name,
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
             'stock' => $barang->stock_barang,
-            'quantity'=>$barang->quantity,
+            'quantity' => $barang->quantity,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
