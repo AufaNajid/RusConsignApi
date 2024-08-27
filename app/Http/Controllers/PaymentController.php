@@ -14,6 +14,7 @@ use Xendit\Invoice\Invoice;
 use Xendit\Invoice\InvoiceApi;
 use App\Models\User;
 
+
 class PaymentController extends Controller
 {
     public function __construct()
@@ -34,7 +35,7 @@ class PaymentController extends Controller
         $quantity = $validatedData['quantity'];
 
         // Ambil data barang dari database
-        $barang = Barang::find($barang_id);
+        $barang = \App\Models\Barang::find($barang_id);
         if (!$barang) {
             return response()->json([
                 'status' => 'error',
@@ -45,9 +46,12 @@ class PaymentController extends Controller
         // Hitung total harga
         $totalAmount = $barang->price * $quantity;
 
+        // Konfigurasi Xendit
+        Xendit::setApiKey(env('XENDIT_API_KEY'));
+
         // Persiapkan data untuk invoice
         $invoiceData = [
-            "external_id" => Str::uuid()->toString(),
+            "external_id" => (string) Str::uuid(),
             'amount' => $totalAmount,
             'description' => 'Invoice for Barang ID ' . $barang_id,
             'invoice_duration' => 3600, // Durasi invoice dalam detik
