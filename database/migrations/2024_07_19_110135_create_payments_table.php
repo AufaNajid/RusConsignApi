@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->string('invoice_url');
             $table->string('grand_total');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('belum_pembayaran');
             $table->timestamps();
         });
     }
