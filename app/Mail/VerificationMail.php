@@ -49,4 +49,13 @@ class VerificationMail extends Mailable
             ],
         );
     }
+
+    public function build()
+    {
+        return $this->view('emails.verification')
+            ->with([
+                'user' => $this->user,
+                'token' => $this->token,
+            ]);
+    }
 }

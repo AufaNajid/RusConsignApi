@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+
     public function index()
     {
+        // Mengambil item cart hanya jika barang terkait ada
         $cartItems = Cart::where('user_id', Auth::id())
+            ->whereHas('barang') // Pastikan hanya mengambil cart yang memiliki barang
             ->with('barang.mitra')
             ->get();
 
