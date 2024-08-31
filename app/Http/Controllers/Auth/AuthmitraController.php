@@ -51,7 +51,6 @@ class AuthmitraController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-
         // Handle image upload
         if ($request->hasFile('image_id_card')) {
             $image = $request->file('image_id_card');
@@ -73,8 +72,8 @@ class AuthmitraController extends Controller
         }
         $userEmail = $user->email;
 
-
         $mitra = new Mitra();
+        $mitra->user_id = $user->id; // Menambahkan user_id
         $mitra->image_profile = $imageIdCardPath;
         $mitra->nama_lengkap = $request->nama_lengkap;
         $mitra->nama_toko = $request->nama_toko;

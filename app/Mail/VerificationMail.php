@@ -39,16 +39,16 @@ class VerificationMail extends Mailable
     /**
      * Get the message content definition.
      */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.verification',
-            with: [
-                'user' => $this->user,
-                'token' => $this->token,
-            ],
-        );
-    }
+//    public function content(): Content
+//    {
+//        return new Content(
+//            view: 'emails.verification',
+//            with: [
+//                'user' => $this->user,
+//                'token' => $this->token,
+//            ],
+//        );
+//    }
 
     public function build()
     {
