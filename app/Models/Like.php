@@ -9,16 +9,17 @@ class Like extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'likeId';
-    protected $fillable = ['user_id', 'barang_id'];
+    protected $primaryKey = 'likeId'; // Primary key
+    protected $fillable = ['user_id', 'barang_id']; // Fillable attributes
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id'); // Relasi ke model User
     }
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Barang::class, 'barang_id'); // Relasi ke model Barang
     }
+
 }

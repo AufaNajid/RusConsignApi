@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerificationMail;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-
     public function index(Request $request)
     {
         if ($request->has('email')) {
@@ -24,31 +27,40 @@ class AuthController extends Controller
 
         return response()->json($users);
     }
+
     public function register(Request $request)
     {
         // Validasi input
         $request->validate([
             "name" => "required|string",
             "email" => "required|string|email|unique:users",
-            "password" => "required|string"
+            "password" => "required|string|min:6"
         ]);
+
+        // Membuat token verifikasi email
+        $verificationToken = Str::random(60);
 
         // Membuat user baru
         $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
             "password" => bcrypt($request->password),
-            "mitra_id" => 0 // Tetapkan mitra_id menjadi 0 secara default
+            "mitra_id" => 0, // Tetapkan mitra_id menjadi 0 secara default
+            "email_verification_token" => $verificationToken // Simpan token verifikasi
         ]);
+
+        // Mengirim email verifikasi
+        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
 
         return response()->json([
             "status" => true,
-            "message" => "User registered successfully",
+            "message" => "User registered successfully. Please check your email for verification.",
             "data" => [
                 "user" => $user
             ]
         ]);
     }
+
 
     public function login(Request $request)
     {
@@ -106,7 +118,7 @@ class AuthController extends Controller
 
         return response()->json([
             "status" => true,
-            "massage" => "User logged out",
+            "message" => "User logged out",
             "data" => []
         ]);
     }
@@ -164,5 +176,122 @@ class AuthController extends Controller
         }
     }
 
+    public function verifyEmail(Request $request, $token)
+    {
+        $user = User::where('email_verification_token', $token)->first();
 
+        if (!$user) {
+            return response()->json(['message' => 'Invalid or expired verification token'], 404);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        $user->email_verified_at = now();
+        $user->email_verification_token = null;
+        $user->save();
+
+        return response()->json(['message' => 'Email verified successfully']);
+    }
+
+
+    public function resendVerification(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        $verificationToken = Str::random(60);
+        $user->update(['email_verification_token' => $verificationToken]);
+
+        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
+
+        return response()->json(['message' => 'Verification email resent successfully']);
+    }
+
+    public function apiVerifyEmail(Request $request, $token)
+    {
+        $user = User::where('email_verification_token', $token)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Invalid verification token'], 404);
+        }
+
+        $user->email_verified_at = now();
+        $user->email_verification_token = null;
+        $user->save();
+
+        return response()->json(['message' => 'Email verified successfully']);
+    }
+
+    public function sendResetPasswordEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Email not found'], 404);
+        }
+
+        $token = Str::random(60);
+        $user->reset_password_token = $token;
+        $user->save();
+
+        $resetLink = url('/reset-password/' . $token);
+        Mail::to($user->email)->send(new ResetPasswordMail($user, $resetLink));
+
+        return response()->json(['message' => 'Reset password email sent']);
+    }
+
+    public function resetpassprofile(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Email not found'], 404);
+        }
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 403);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password has been updated successfully']);
+    }
+
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::where('reset_password_token', $request->token)->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Invalid reset token.');
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->reset_password_token = null;
+        $user->save();
+
+        return view('completeresetpass');
+    }
 }

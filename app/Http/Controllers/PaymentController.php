@@ -40,16 +40,13 @@ class PaymentController extends Controller
                 'description' => 'Invoice for user ' . $user->name,
             ];
 
-            // Generate the invoice using the API instance
             $apiInstance = new InvoiceApi();
             $generateInvoice = $apiInstance->createInvoice($createdInvoice);
 
-            // Check if the response has the necessary property
             if (!isset($generateInvoice['invoice_url'])) {
                 throw new \Exception('Invoice URL not found in the response');
             }
 
-            // Save the payment order to the database
             $order = new Payment([
                 'barang_id' => $validatedData['barang_id'],
                 'user_id' => $user->id,
@@ -70,38 +67,52 @@ class PaymentController extends Controller
         }
     }
 
-//    public function webhook(Request $request)
-//    {
-//        try {
-//            // Retrieve the invoice using the ID from the webhook request
-//            $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
+    public function notificationCallback(Request $request)
+    {
+        $getToken = $request->headers->get('x-callback-token');
+        $callbackToken = env('XENDIT_CALLBACK_TOKEN');
+
+        try{
+            return response()->json([
+                'status' => 'check token',
+                'message' => 'Check token from xendit',
+                'token' => $getToken,
+            ],Reponse::HTTP_OK);
+        }
+    }
+
+//   public function webhook(Request $request)
+//   {
+//       try {
+//           // Retrieve the invoice using the ID from the webhook request
+//           $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
 //
-//            // Find the corresponding payment record from the database
-//            $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
+//           // Find the corresponding payment record from the database
+//           $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
 //
-//            // Check if the payment status is already 'settled'
-//            if ($payment->status == 'settled') {
-//                return response()->json([
-//                    "data" => "Payment has already been processed"
-//                ], 200); // Return 200 OK if payment is already processed
-//            }
+//           // Check if the payment status is already 'settled'
+//           if ($payment->status == 'settled') {
+//               return response()->json([
+//                   "data" => "Payment has already been processed"
+//               ], 200); // Return 200 OK if payment is already processed
+//           }
 //
-//            // Update the payment status based on the invoice status
-//            $payment->status = strtolower($getInvoice['status']);
-//            $payment->save();
+//           // Update the payment status based on the invoice status
+//           $payment->status = strtolower($getInvoice['status']);
+//           $payment->save();
 //
-//            // Return a success response
-//            return response()->json([
-//                "data" => "Payment status updated successfully"
-//            ], 200);
+//           // Return a success response
+//           return response()->json([
+//               "data" => "Payment status updated successfully"
+//           ], 200);
 //
-//        } catch (\Exception $e) {
-//            // Handle errors and return a response with error message
-//            return response()->json([
-//                "error" => $e->getMessage()
-//            ], 500);
-//        }
-//    }
+//       } catch (\Exception $e) {
+//           // Handle errors and return a response with error message
+//           return response()->json([
+//               "error" => $e->getMessage()
+//           ], 500);
+//       }
+//   }
 
 
 }

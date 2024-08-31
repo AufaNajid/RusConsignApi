@@ -16,6 +16,7 @@ use App\Http\Controllers\OTPController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,6 @@ use Illuminate\Support\Facades\Storage;
 //         return $request->user();
 //     });
 // });
-
 
 
 Route::post('register', [AuthController::class, 'register']);
@@ -42,6 +42,14 @@ Route::post('loginadmin',[AuthadminController::class,'loginadmin']);
 Route::group([
     "middleware" => ["auth:sanctum"]
 ], function(){
+
+    Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
+    Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
+    Route::post('/api-verify-email/{token}', [AuthController::class, 'apiVerifyEmail']);
+
+    Route::post('/send-reset-password-email', [AuthController::class, 'sendResetPasswordEmail']);
+    Route::post('/reset-password-profile', [AuthController::class, 'resetpassprofile']);
+    Route::post('/reset-password', [AuthController::class, 'reset']);
 
     Route::get('/users', [AuthController::class, 'index']);
     Route::get('/mitra',[AuthmitraController::class, 'index']);
@@ -131,7 +139,7 @@ Route::post('add-lokasi', [\App\Http\Controllers\LokasiController::class, 'lokas
 
 Route::put('accept/{id}', [AuthmitraController::class, 'accept']);
 Route::get("mitra/show/{id}", [AuthmitraController::class, "show"])->middleware('auth:sanctum');
-Route::delete('reject/{id}', [AuthmitraController::class, 'reject'])->middleware('auth:sanctum');
+Route::delete('reject/{id}', [AuthmitraController::class, 'reject']);
 
 Route::put('/mitras/{id}', [AuthmitraController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/mitras/{id}', [AuthmitraController::class, 'destroy'])->middleware('auth:sanctum');

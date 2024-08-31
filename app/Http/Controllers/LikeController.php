@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    // Get all liked items for the authenticated user
     public function index()
     {
         $user = Auth::user();
@@ -24,12 +23,11 @@ class LikeController extends Controller
             return response()->json(['message' => 'No likes found'], 404);
         }
 
-        // Create an array to store like data with additional information
         $likeData = [];
         foreach ($likes as $like) {
             $barang = $like->barang;
             $likeData[] = [
-                'id' => $like->id,  // Adjusted to use correct like id field
+                'id' => $like->id,
                 'created_at' => $like->created_at,
                 'updated_at' => $like->updated_at,
                 'barang' => [
@@ -83,7 +81,6 @@ class LikeController extends Controller
 
         return response()->json(['message' => 'Product liked', 'like' => $like], 200);
     }
-    // Unfavorite a product
     public function unfavorite($barang_id)
     {
         $user = Auth::user();

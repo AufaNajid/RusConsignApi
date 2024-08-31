@@ -33,7 +33,6 @@ class CODController extends Controller
         $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
         $user = Auth::user();
 
-        // Pastikan nama kolom yang digunakan untuk stok sesuai
         if ($barang->stock_barang < $validatedData['quantity']) {
             return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
         }
@@ -44,7 +43,6 @@ class CODController extends Controller
         $barang->stock_barang -= $validatedData['quantity'];
         $barang->save();
 
-        // Create COD record
         $cod = Cod::create([
             'barang_id' => $validatedData['barang_id'],
             'lokasi_id' => $validatedData['lokasi_id'],
@@ -157,7 +155,6 @@ class CODController extends Controller
     {
         $cod = Cod::findOrFail($id);
 
-        // Cek apakah status pembayaran masih 'belum_pembayaran'
         if ($cod->status_pembayaran !== 'belum_pembayaran') {
             return response()->json(['message' => 'Pesanan tidak dapat dibatalkan karena status pembayaran bukan belum pembayaran'], 400);
         }

@@ -9,6 +9,8 @@ class Barang extends Model
 {
     use HasFactory;
 
+    protected $table = 'barangs';
+
     /**
      * The attributes that are mass assignable.
      *

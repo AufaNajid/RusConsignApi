@@ -22,7 +22,7 @@ class BarangController extends Controller
     {
         $request->validate([
             'mitra_id' => 'required|integer|exists:mitras,id',
-            'category_id' => 'nullable|integer|exists:categories,id', // Optional, to filter by category
+            'category_id' => 'nullable|integer|exists:categories,id',
         ]);
 
         $mitraId = $request->input('mitra_id');
@@ -59,7 +59,7 @@ class BarangController extends Controller
             ];
         }
 
-        // Return the response
+
         return response()->json([
             'message' => 'Data barang berhasil ditemukan',
             'barangs' => $barangData,
@@ -166,7 +166,7 @@ class BarangController extends Controller
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
-                'rating_barang' => $avg, // Menggunakan avg dari perhitungan
+                'rating_barang' => $avg,
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
@@ -238,7 +238,6 @@ class BarangController extends Controller
             ];
         }
 
-        // Return the response
         return response()->json([
             'message' => 'Data barang berhasil ditemukan',
             'barangs' => $barangData,
@@ -254,7 +253,6 @@ class BarangController extends Controller
 
         $barangData = [];
         foreach ($barangs as $barang) {
-            // Menghitung rata-rata rating untuk setiap barang
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -273,7 +271,7 @@ class BarangController extends Controller
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
-                'rating_barang' => $avg, // Menggunakan avg dari perhitungan
+                'rating_barang' => $avg,
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
@@ -383,10 +381,8 @@ class BarangController extends Controller
                 $mitraId = $request->input('mitra_id');
                 $imagePath = "product_images/{$mitraId}_{$imageName}";
 
-                // Store the image in the 'public' disk (this will make it publicly accessible)
                 $imagePath = $image->storeAs('public/product_images', $imageName);
 
-                // Generate the public URL to the image
                 $imageProductPath = Storage::url($imagePath);
             }
 
@@ -463,7 +459,6 @@ class BarangController extends Controller
 
 
         if ($request->hasFile('image_barang')) {
-            // Hapus gambar lama jika ada
             if ($barang->image_barang) {
                 $oldImagePath = str_replace('/storage/', '', $barang->image_barang);
                 if (Storage::disk('public')->exists($oldImagePath)) {
@@ -478,10 +473,8 @@ class BarangController extends Controller
             $barang->image_barang = Storage::url($imagePath); // Menggunakan jalur yang konsisten
         }
 
-        // Simpan perubahan ke database
         $barang->save();
 
-        // Ambil data kategori dan mitra
         $category = $barang->category;
         $mitra = $barang->mitra;
 
@@ -496,7 +489,6 @@ class BarangController extends Controller
             'penilaian' => $mitra->penilaian,
         ] : null;
 
-        // Kembalikan respons JSON
         return response()->json([
             'message' => 'Produk berhasil diperbarui',
             'product' => $barang,
