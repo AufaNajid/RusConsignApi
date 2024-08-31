@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id('carts_id');
-            $table->foreignid('barang_id')->constrained('mitras')->onDelete('cascade');;
+//            $table->unsignedBigInteger('barang_id')->references('id')->on('barangs')->onDelete('cascade');
+            $table->foreignId('barang_id')->onDelete('cascade');
             $table->foreignid('user_id');
             $table->integer('quantity')->default(1);
             $table->decimal('total_price', 10, 2);
