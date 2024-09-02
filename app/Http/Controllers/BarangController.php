@@ -564,6 +564,7 @@ class BarangController extends Controller
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
                 'rating_barang' => $barang->rating_barang,
+                'status_post'=> $barang->status_post
                 'category_id' => $barang->category->id,
                 'category_name' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
