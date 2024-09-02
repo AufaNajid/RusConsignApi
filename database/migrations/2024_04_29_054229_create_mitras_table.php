@@ -28,6 +28,7 @@
                     $table->float("penilaian")->default(0);
                     $table->string("email")->nullable();
                     $table->string("status_pembayaran")->nullable();
+                    $table->string("no_whatsapp");
                     $table->foreignId("user_id")->constrained()->onDelete('cascade');
                     $table->rememberToken();
                     $table->timestamps();

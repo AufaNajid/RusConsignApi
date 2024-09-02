@@ -30,26 +30,22 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi input
         $request->validate([
             "name" => "required|string",
             "email" => "required|string|email|unique:users",
             "password" => "required|string|min:6"
         ]);
 
-        // Membuat token verifikasi email
         $verificationToken = Str::random(60);
 
-        // Membuat user baru
         $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
             "password" => bcrypt($request->password),
-            "mitra_id" => 0, // Tetapkan mitra_id menjadi 0 secara default
-            "email_verification_token" => $verificationToken // Simpan token verifikasi
+            "mitra_id" => 0,
+            "email_verification_token" => $verificationToken
         ]);
 
-        // Mengirim email verifikasi
         Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
 
         return response()->json([
@@ -64,16 +60,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validasi input
         $request->validate([
             'email' => 'required|email|string',
             'password' => 'required|string|min:6'
         ]);
 
-        // Cari user berdasarkan email
         $user = User::where('email', $request->email)->first();
 
-        // Periksa apakah user ada dan password cocok
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
@@ -82,10 +75,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Pastikan user berhasil diautentikasi
         Auth::login($user);
 
-        // Buat token akses pribadi setelah user berhasil diotentikasi
         $token = $user->createToken('my-app-token')->plainTextToken;
 
         return response()->json([

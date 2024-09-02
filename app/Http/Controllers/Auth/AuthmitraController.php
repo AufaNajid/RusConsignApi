@@ -44,6 +44,7 @@ class AuthmitraController extends Controller
             "nis" => "required|integer|unique:mitras",
             "no_dompet_digital" => "required|string",
             "image_id_card" => "required|image",
+            "no_whatsapp" => "required|string",
             "status" => "string"
         ]);
 
@@ -51,7 +52,6 @@ class AuthmitraController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Handle image upload
         if ($request->hasFile('image_id_card')) {
             $image = $request->file('image_id_card');
 
@@ -73,7 +73,7 @@ class AuthmitraController extends Controller
         $userEmail = $user->email;
 
         $mitra = new Mitra();
-        $mitra->user_id = $user->id; // Menambahkan user_id
+        $mitra->user_id = $user->id;
         $mitra->image_profile = $imageIdCardPath;
         $mitra->nama_lengkap = $request->nama_lengkap;
         $mitra->nama_toko = $request->nama_toko;
@@ -82,6 +82,7 @@ class AuthmitraController extends Controller
         $mitra->image_id_card = $imageIdCardPath;
         $mitra->status = $request->status ?? 'pending';
         $mitra->email = $userEmail;
+        $mitra->no_whatsapp = $request->no_whatsapp;
 
         if ($mitra->save()) {
             $profileImage = $user->profileImages()->firstOrNew([]);
@@ -107,6 +108,7 @@ class AuthmitraController extends Controller
             "nis" => "integer|unique:mitras,nis," . $id,
             "no_dompet_digital" => "string",
             "image_id_card" => "image",
+            "no_whatsapp"=> "string",
             "status" => "string"
         ]);
 
@@ -124,6 +126,7 @@ class AuthmitraController extends Controller
         $mitra->nama_lengkap = $request->nama_lengkap ?? $mitra->nama_lengkap;
         $mitra->nis = $request->nis ?? $mitra->nis;
         $mitra->no_dompet_digital = $request->no_dompet_digital ?? $mitra->no_dompet_digital;
+        $mitra->no_whatsapp = $request->no_whatsapp ?? $mitra->no_whatsapp;
         $mitra->status = $request->status ?? $mitra->status;
 
         if ($mitra->save()) {
@@ -154,7 +157,6 @@ class AuthmitraController extends Controller
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
-        // Change status to "accepted"
         $mitra->status = 'accepted';
         if ($mitra->save()) {
             return new MitraResource($mitra);
@@ -170,7 +172,6 @@ class AuthmitraController extends Controller
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
-        // Change status to "rejected"
         $mitra->status = 'rejected';
         if ($mitra->save()) {
             return new MitraResource($mitra);

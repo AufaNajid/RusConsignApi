@@ -11,15 +11,12 @@ class ForgotPasswordController extends Controller
 {
     public function forgot(Request $request)
     {
-        // Validate email
         $request->validate(['email' => 'required|email']);
 
-        // Send password reset link
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
-        // Check if email was sent successfully
         if ($status === Password::RESET_LINK_SENT) {
             return response()->json(['message' => __($status)]);
         } else {

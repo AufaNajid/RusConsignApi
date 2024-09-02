@@ -147,7 +147,6 @@ class BarangController extends Controller
 
         $barangData = [];
         foreach ($barangs as $barang) {
-            // Menghitung rata-rata rating untuk setiap barang
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -470,7 +469,7 @@ class BarangController extends Controller
             $image = $request->file('image_barang');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $imagePath = $image->storeAs('product_images', $imageName, 'public');
-            $barang->image_barang = Storage::url($imagePath); // Menggunakan jalur yang konsisten
+            $barang->image_barang = Storage::url($imagePath);
         }
 
         $barang->save();

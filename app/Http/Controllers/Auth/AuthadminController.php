@@ -16,7 +16,7 @@ class AuthadminController extends Controller
     public function registeradmin(Request $request)
     {
         $request->validate([
-            "email" => "required|string|email|unique:admins,email", // Perbaikan validasi unique pada tabel admins
+            "email" => "required|string|email|unique:admins,email",
             "password" => "required"
         ]);
 
@@ -27,7 +27,7 @@ class AuthadminController extends Controller
 
         return response()->json([
             "status" => true,
-            "message" => "Admin registered successfully", // Perbaikan typo "message"
+            "message" => "Admin registered successfully",
             "data" => []
         ]);
     }
@@ -48,21 +48,21 @@ class AuthadminController extends Controller
 
                 return response()->json([
                     "status" => true,
-                    "message" => "User logged in", // Perbaikan typo "message"
+                    "message" => "User logged in",
                     "token" => $token,
                     "data" => []
                 ]);
             } else {
                 return response()->json([
                     "status" => false,
-                    "message" => "Invalid password", // Perbaikan typo "message"
+                    "message" => "Invalid password",
                     "data" => []
                 ]);
             }
         } else {
             return response()->json([
                 "status" => false,
-                "message" => "Email doesn't match with records", // Perbaikan typo "message"
+                "message" => "Email doesn't match with records",
                 "data" => []
             ]);
         }

@@ -12,9 +12,8 @@ class CartController extends Controller
 
     public function index()
     {
-        // Mengambil item cart hanya jika barang terkait ada
         $cartItems = Cart::where('user_id', Auth::id())
-            ->whereHas('barang') // Pastikan hanya mengambil cart yang memiliki barang
+            ->whereHas('barang')
             ->with('barang.mitra')
             ->get();
 
