@@ -43,6 +43,7 @@ Route::group([
     "middleware" => ["auth:sanctum"]
 ], function(){
 
+
     Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
     Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
     Route::post('/api-verify-email/{token}', [AuthController::class, 'apiVerifyEmail']);
