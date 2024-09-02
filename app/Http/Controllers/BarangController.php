@@ -60,12 +60,12 @@ class BarangController extends Controller
             ];
         }
 
-
         return response()->json([
             'message' => 'Data barang berhasil ditemukan',
             'barangs' => $barangData,
         ], 200);
     }
+
 
 
     public function searchAcceptedBarangs(Request $request)
@@ -76,7 +76,7 @@ class BarangController extends Controller
             return response()->json(['message' => 'Kata kunci pencarian harus diberikan'], 400);
         }
 
-        $categoryId = $request-> query('category_id');
+        $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
             ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian')
@@ -108,13 +108,12 @@ class BarangController extends Controller
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
-                'status_post' => $barang->status_post,
-                'quantity'=>$barang->quantity,
+                'quantity' => $barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
                     'id' => $barang->mitra->id,
-                    'nama_toko'=>$barang->mitra->nama_toko,
+                    'nama_toko' => $barang->mitra->nama_toko,
                     'nama_lengkap' => $barang->mitra->nama_lengkap,
                     'jumlah_product' => $barang->mitra->jumlah_product,
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
@@ -174,7 +173,6 @@ class BarangController extends Controller
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
                 'quantity' => $barang->quantity,
-                'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -196,7 +194,6 @@ class BarangController extends Controller
     }
 
 
-
     public function filterProductsByCategory(Request $request)
     {
         $request->validate([
@@ -206,7 +203,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $barangs = Barang::where('category_id', $categoryId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian')
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')
             ->get();
 
         if ($barangs->isEmpty()) {
@@ -237,6 +234,7 @@ class BarangController extends Controller
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp'=> $barang->mitra->no_whatsapp,
                 ],
             ];
         }
@@ -364,7 +362,7 @@ class BarangController extends Controller
                 'rating_barang' => 'numeric',
                 'category_id' => 'required|in:1,2',
                 'image_barang' => 'required|image',
-                'stock_barang'=>'required|integer'
+                'stock_barang'=>'required|integer',
             ]);
 
             $user = Auth::user();
