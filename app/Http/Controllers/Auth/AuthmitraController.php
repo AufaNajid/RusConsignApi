@@ -154,14 +154,16 @@ class AuthmitraController extends Controller
     public function accept(Request $request, $id)
     {
         $mitra = Mitra::find($id);
-        if (!$mitra) {
 
+        if (!$mitra) {
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
         $mitra->status = 'accepted';
+
         if ($mitra->save()) {
-//            $mitra->user->notify(new MitraStatusChanged($mitra, 'accepted'));
+            $mitra->notify(new MitraStatusChanged($mitra, 'accepted'));
+
             return new MitraResource($mitra);
         } else {
             return response()->json(['message' => 'Failed to accept mitra'], 500);
@@ -171,13 +173,16 @@ class AuthmitraController extends Controller
     public function reject(Request $request, $id)
     {
         $mitra = Mitra::find($id);
+
         if (!$mitra) {
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
         $mitra->status = 'rejected';
+
         if ($mitra->save()) {
-//            $mitra->user->notify(new MitraStatusChanged($mitra, 'rejected'));
+            $mitra->notify(new MitraStatusChanged($mitra, 'rejected'));
+
             return new MitraResource($mitra);
         } else {
             return response()->json(['message' => 'Failed to reject mitra'], 500);
@@ -213,10 +218,17 @@ class AuthmitraController extends Controller
             return response()->json(['message' => 'Failed to add product'], 500);
         }
     }
-
-    public function tambahjasa()
+    public function getNotifications($id)
     {
+        $mitra = Mitra::find($id);
 
+        if (!$mitra) {
+            return response()->json(['message' => 'Mitra not found'], 404);
+        }
+
+        $notifications = $mitra->notifications;
+
+        return response()->json($notifications);
     }
 
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\ChatMessageController;
 use App\Http\Controllers\JasaController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MitraController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -42,6 +43,11 @@ Route::post('loginadmin',[AuthadminController::class,'loginadmin']);
 Route::group([
     "middleware" => ["auth:sanctum"]
 ], function(){
+
+    Route::get('/notifications', [NotificationController::class, 'getUnreadNotifications']);
+    Route::get('/notifications/all', [NotificationController::class, 'getAllNotifications']);
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
+    Route::get('/mitra/{id}/notifications', [AuthmitraController::class, 'getNotifications']);
 
 
     Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);

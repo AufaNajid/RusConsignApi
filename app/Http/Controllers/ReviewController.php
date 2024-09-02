@@ -27,10 +27,10 @@ class ReviewController extends Controller
         $total = $rate->sum('total');
         $avg = $rate->reduce(function ($carry, $item) {
                 return $carry + ($item->total * $item->rate);
-            }, 0) / ($total ?: 1); // Menghindari pembagian dengan 0 jika total = 0
+            }, 0) / ($total ?: 1);
 
-        // Mengambil semua review beserta informasi user
-        $reviews = Komentar::with('user') // Asumsikan relasi ke user sudah didefinisikan di model Komentar
+
+        $reviews = Komentar::with('user')
         ->where('barang_id', $barangId)
             ->orderBy('created_at', 'desc')
             ->get();

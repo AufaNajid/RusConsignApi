@@ -3,9 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class MitraStatusChanged extends Notification
 {
@@ -14,50 +14,31 @@ class MitraStatusChanged extends Notification
     protected $mitra;
     protected $status;
 
-    /**
-     * Create a new notification instance.
-     *
-     * @param $mitra
-     * @param string $status
-     */
-    public function __construct($mitra, string $status)
+    public function __construct($mitra, $status)
     {
         $this->mitra = $mitra;
         $this->status = $status;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
+            ->line('Your Mitra status has been ' . $this->status . '.')
+            ->action('View Mitra', url('/mitra/' . $this->mitra->id))
             ->line('Thank you for using our application!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable)
     {
         return [
             'mitra_id' => $this->mitra->id,
             'status' => $this->status,
-            'message' => 'Status mitra Anda telah berubah menjadi: ' . $this->status,
+            'message' => 'Your Mitra status has been ' . $this->status,
         ];
     }
 }
