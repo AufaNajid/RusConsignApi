@@ -53,6 +53,7 @@ class BarangController extends Controller
                 'category_name' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'stock' => $barang->stock_barang,
+                'status_post' => $barang->status_post,
                 'quantity' => $barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
@@ -107,6 +108,7 @@ class BarangController extends Controller
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
+                'status_post' => $barang->status_post,
                 'quantity'=>$barang->quantity,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
@@ -172,6 +174,7 @@ class BarangController extends Controller
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
                 'quantity' => $barang->quantity,
+                'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -223,6 +226,7 @@ class BarangController extends Controller
                 'image_barang' => $barang->image_barang,
                 'stock' => $barang->stock_barang,
                 'quantity'=>$barang->quantity,
+                'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -277,6 +281,7 @@ class BarangController extends Controller
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
                 'quantity' => $barang->quantity,
+                'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
@@ -305,7 +310,6 @@ class BarangController extends Controller
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
         }
 
-        // Menghitung rata-rata rating untuk barang yang ditampilkan
         $rate = Komentar::select(
             DB::raw('count(1) as total'),
             'rate'
@@ -324,13 +328,14 @@ class BarangController extends Controller
             'nama_barang' => $barang->nama_barang,
             'deskripsi' => $barang->deskripsi,
             'harga' => $barang->harga,
-            'rating_barang' => $avg, // Menggunakan avg dari perhitungan
+            'rating_barang' => $avg,
             'category_id' => $barang->category->id,
             'category_nama' => $barang->category->name,
             'image_barang' => $barang->image_barang,
             'status' => $barang->status_post,
             'stock' => $barang->stock_barang,
             'quantity' => $barang->quantity,
+            'status_post' => $barang->status_post,
             'created_at' => $barang->created_at,
             'updated_at' => $barang->updated_at,
             'mitra' => [
