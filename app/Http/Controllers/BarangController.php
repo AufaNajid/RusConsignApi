@@ -29,7 +29,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $query = Barang::where('mitra_id', $mitraId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian');
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -79,7 +79,7 @@ class BarangController extends Controller
         $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
-            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian')
+            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')
             ->where(function ($query) use ($searchTerm) {
                 $query->where('nama_barang', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('deskripsi', 'LIKE', "%{$searchTerm}%");
@@ -119,6 +119,7 @@ class BarangController extends Controller
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp'=> $barang->mitra->no_whatsapp,
                 ],
             ];
         }
@@ -134,7 +135,7 @@ class BarangController extends Controller
         $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
-            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian');
+            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -183,6 +184,7 @@ class BarangController extends Controller
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp'=> $barang->mitra->no_whatsapp,
                 ],
             ];
         }
@@ -203,7 +205,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $barangs = Barang::where('category_id', $categoryId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',)
             ->get();
 
         if ($barangs->isEmpty()) {
@@ -222,13 +224,13 @@ class BarangController extends Controller
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
                 'stock' => $barang->stock_barang,
-                'quantity'=>$barang->quantity,
+                'quantity' => $barang->quantity,
                 'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
                 'mitra' => [
                     'id' => $barang->mitra->id,
-                    'nama_toko'=>$barang->mitra->nama_toko,
+                    'nama_toko' => $barang->mitra->nama_toko,
                     'nama_lengkap' => $barang->mitra->nama_lengkap,
                     'jumlah_product' => $barang->mitra->jumlah_product,
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
@@ -240,13 +242,13 @@ class BarangController extends Controller
         }
 
         return response()->json([
-            'message' => 'Data barang berhasil ditemukan',
+            'message' => 'Data barang berdasarkan kategori berhasil ditemukan',
             'barangs' => $barangData,
         ], 200);
     }
     public function index()
     {
-        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian')->get();
+        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')->get();
 
         if ($barangs->isEmpty()) {
             return response()->json(['message' => 'Tidak ada barang yang ditemukan'], 404);
@@ -290,6 +292,7 @@ class BarangController extends Controller
                     'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp'=> $barang->mitra->no_whatsapp,
                 ],
             ];
         }
@@ -302,7 +305,7 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian')->find($id);
+        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')->find($id);
 
         if (!$barang) {
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
@@ -344,6 +347,7 @@ class BarangController extends Controller
                 'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
+                'no_whatsapp'=> $barang->mitra->no_whatsapp,
             ],
         ];
 

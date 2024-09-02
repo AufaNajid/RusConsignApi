@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MitraResource;
 use App\Models\Mitra;
 use App\Models\User;
+use App\Notifications\MitraStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -154,11 +155,13 @@ class AuthmitraController extends Controller
     {
         $mitra = Mitra::find($id);
         if (!$mitra) {
+
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
         $mitra->status = 'accepted';
         if ($mitra->save()) {
+            $mitra->user->notify(new MitraStatusChanged($mitra, 'accepted'));
             return new MitraResource($mitra);
         } else {
             return response()->json(['message' => 'Failed to accept mitra'], 500);
@@ -174,6 +177,7 @@ class AuthmitraController extends Controller
 
         $mitra->status = 'rejected';
         if ($mitra->save()) {
+            $mitra->user->notify(new MitraStatusChanged($mitra, 'rejected'));
             return new MitraResource($mitra);
         } else {
             return response()->json(['message' => 'Failed to reject mitra'], 500);
