@@ -104,9 +104,8 @@ class ProfileController extends Controller
             }
         }
 
-        // Update nama toko dalam tabel mitra jika ada
         if (isset($validatedData['nama_toko'])) {
-            $profileImage = $user->profileImages()->first(); // Dapatkan gambar profil pertama
+            $profileImage = $user->profileImages()->first();
             if ($profileImage && $profileImage->mitra) {
                 $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
                 $profileImage->mitra->save();

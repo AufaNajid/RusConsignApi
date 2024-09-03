@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Auth\Notifications\VerifyEmail;
 
 class VerifyEmailNotification extends VerifyEmail
 {
@@ -61,4 +61,6 @@ class VerifyEmailNotification extends VerifyEmail
             ->action('Verify Email Address', $url)
             ->line('If you did not create an account, no further action is required.');
     }
+
+
 }

@@ -2,13 +2,10 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\User;
 
 class VerificationMail extends Mailable
 {
@@ -19,43 +16,24 @@ class VerificationMail extends Mailable
 
     /**
      * Create a new message instance.
+     *
+     * @param  \App\Models\User  $user
+     * @return void
      */
-    public function __construct(User $user, $token)
+    public function __construct(User $user,$token)
     {
         $this->user = $user;
         $this->token = $token;
+
     }
 
     /**
-     * Get the message envelope.
+     * Build the message.
+     *
+     * @return $this
      */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Email Verification',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-//    public function content(): Content
-//    {
-//        return new Content(
-//            view: 'emails.verification',
-//            with: [
-//                'user' => $this->user,
-//                'token' => $this->token,
-//            ],
-//        );
-//    }
-
     public function build()
     {
-        return $this->view('emails.verification')
-            ->with([
-                'user' => $this->user,
-                'token' => $this->token,
-            ]);
+        return $this->subject('Verify Your Email Address')->view('emails.verify');
     }
 }
