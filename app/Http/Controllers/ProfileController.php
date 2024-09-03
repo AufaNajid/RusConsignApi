@@ -81,9 +81,8 @@ class ProfileController extends Controller
                 $user->bio_desc = $validatedData['bio_desc'];
             }
 
-            // Handle profile image update
             if (isset($validatedData['image_profile'])) {
-                $profileImage = $user->profileImages()->first(); // Get the first profile image
+                $profileImage = $user->profileImages()->first();
                 if ($profileImage) {
                     // Delete old image if exists
                     if (Storage::exists($profileImage->image_profile)) {
@@ -101,8 +100,8 @@ class ProfileController extends Controller
                         'mitra_id' => null,
                     ]);
                 }
-                // Optionally update user with the new image
-                $user->image_profiles = $profileImage->image_profile; // Update this field
+
+                $user->image_profile = $profileImage->image_profile;
             }
 
             // Handle 'nama_toko' update
@@ -112,8 +111,7 @@ class ProfileController extends Controller
                     $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
                     $profileImage->mitra->save();
                 } else {
-                    // Optionally handle the case where 'mitra' is null
-                }
+                                   }
             }
 
         // Save user data
