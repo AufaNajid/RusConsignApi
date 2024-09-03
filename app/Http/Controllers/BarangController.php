@@ -352,7 +352,7 @@ class BarangController extends Controller
                 'no_whatsapp' => $barang->mitra->no_whatsapp,
             ],
             'user' => [
-                'image_profiles' => $barang->user ? $barang->user->image_profiles : null,
+                'image_profiles' => $barang->user ? $barang->user->image_profile : null,
             ]
         ];
 
