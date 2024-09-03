@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\Cart;
+use App\Models\Komentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
