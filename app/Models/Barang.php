@@ -54,4 +54,8 @@ class Barang extends Model
     {
         return $this->hasMany(Cart::class);
     }
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
