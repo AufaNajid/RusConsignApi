@@ -162,7 +162,7 @@ class AuthmitraController extends Controller
         $mitra->status = 'accepted';
 
         if ($mitra->save()) {
-            $mitra->notify(new MitraStatusChanged($mitra, 'accepted'));
+//            $mitra->notify(new MitraStatusChanged($mitra, 'accepted'));
 
             return new MitraResource($mitra);
         } else {
@@ -181,7 +181,7 @@ class AuthmitraController extends Controller
         $mitra->status = 'rejected';
 
         if ($mitra->save()) {
-            $mitra->notify(new MitraStatusChanged($mitra, 'rejected'));
+//            $mitra->notify(new MitraStatusChanged($mitra, 'rejected'));
 
             return new MitraResource($mitra);
         } else {

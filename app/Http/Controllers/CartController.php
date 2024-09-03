@@ -22,7 +22,6 @@ class CartController extends Controller
         $cartItems->map(function ($cartItem) {
             $barang = $cartItem->barang;
 
-            // Hitung rating rata-rata
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -36,7 +35,6 @@ class CartController extends Controller
                     return $carry + ($item->total * $item->rate);
                 }, 0) / ($total ?: 1);
 
-            // Tambahkan nilai rating rata-rata ke dalam barang
             $cartItem->barang->rating_barang = $avg;
         });
 
