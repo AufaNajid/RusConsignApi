@@ -354,7 +354,6 @@ class BarangController extends Controller
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
                 'no_whatsapp' => $barang->mitra->no_whatsapp,
-                'image_profile' => $barang->mitra->image_profile, // Menggunakan image_profile dari tabel mitras
                 'profile_image' => $barang->mitra->profileImage->image_profile ?? null // Mengambil image_profile dari tabel profile_images jika tersedia
             ]
         ];
