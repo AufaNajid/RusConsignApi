@@ -51,7 +51,9 @@ class AuthController extends Controller
         return response()->json([
             "status" => true,
             "message" => "User registered successfully. Please check your email for verification.",
-            "data" => ["user" => $user]
+            "data" => [
+                "user" => $user
+            ]
         ]);
     }
 
@@ -187,8 +189,6 @@ class AuthController extends Controller
 
     public function resendVerification(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
-
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -206,7 +206,6 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Verification email resent successfully']);
     }
-
 
     public function apiVerifyEmail(Request $request, $token)
     {
