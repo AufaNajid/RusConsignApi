@@ -294,6 +294,7 @@ class BarangController extends Controller
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
                 ],
+                'email_user' => Auth::user()->email,
             ];
         }
 
@@ -352,7 +353,7 @@ class BarangController extends Controller
         ];
 
         return response()->json([
-            'message' => 'Data barang berhasil ditemukan',
+            'message' => 'Data barang berhasil ditemuka  n',
             'barang' => $barangData,
         ], 200);
     }
