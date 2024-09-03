@@ -222,25 +222,25 @@ class AuthController extends Controller
         return response()->json(['message' => 'Email verified successfully']);
     }
 
-    public function sendResetPasswordEmail(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Email not found'], 404);
-        }
-
-        $token = Str::random(60);
-        $user->reset_password_token = $token;
-        $user->save();
-
-        $resetLink = url('/reset-password/' . $token);
-        Mail::to($user->email)->send(new ResetPasswordMail($user, $resetLink));
-
-        return response()->json(['message' => 'Reset password email sent']);
-    }
+//    public function sendResetPasswordEmail(Request $request)
+//    {
+//        $request->validate(['email' => 'required|email']);
+//
+//        $user = User::where('email', $request->email)->first();
+//
+//        if (!$user) {
+//            return response()->json(['message' => 'Email not found'], 404);
+//        }
+//
+//        $token = Str::random(60);
+//        $user->reset_password_token = $token;
+//        $user->save();
+//
+//        $resetLink = url('/reset-password/' . $token);
+//        Mail::to($user->email)->send(new ResetPasswordMail($user, $resetLink));
+//
+//        return response()->json(['message' => 'Reset password email sent']);
+//    }
 
     public function resetpassprofile(Request $request)
     {

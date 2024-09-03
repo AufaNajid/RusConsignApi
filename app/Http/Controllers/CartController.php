@@ -14,8 +14,29 @@ class CartController extends Controller
     {
         $cartItems = Cart::where('user_id', Auth::id())
             ->whereHas('barang')
-            ->with('barang.mitra')
+            ->with(['barang.mitra'])
             ->get();
+
+        $cartItems->map(function ($cartItem) {
+            $barang = $cartItem->barang;
+
+            // Hitung rating rata-rata
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barang->id)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avg = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
+            // Tambahkan nilai rating rata-rata ke dalam barang
+            $cartItem->barang->rating_barang = $avg;
+        });
 
         return response()->json([
             "message" => "Data Cart berhasil ditemukan",
