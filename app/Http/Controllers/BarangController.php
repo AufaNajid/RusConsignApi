@@ -248,7 +248,7 @@ class BarangController extends Controller
     }
     public function index()
     {
-        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')->get();
+        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email')->get();
 
         if ($barangs->isEmpty()) {
             return response()->json(['message' => 'Tidak ada barang yang ditemukan'], 404);
