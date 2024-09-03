@@ -29,7 +29,6 @@ class LikeController extends Controller
         foreach ($likes as $like) {
             $barang = $like->barang;
 
-            // Hitung rata-rata rating barang
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -44,7 +43,7 @@ class LikeController extends Controller
                 }, 0) / ($total ?: 1);
 
             $likeData[] = [
-                'id' => $like->id,
+                'id' => $like->likeid,
                 'created_at' => $like->created_at,
                 'updated_at' => $like->updated_at,
                 'barang' => [

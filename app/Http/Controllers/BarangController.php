@@ -29,7 +29,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $query = Barang::where('mitra_id', $mitraId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp');
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -79,7 +79,7 @@ class BarangController extends Controller
         $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
-            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')
+            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage')
             ->where(function ($query) use ($searchTerm) {
                 $query->where('nama_barang', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('deskripsi', 'LIKE', "%{$searchTerm}%");
@@ -120,6 +120,7 @@ class BarangController extends Controller
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                 ],
             ];
         }
@@ -135,7 +136,7 @@ class BarangController extends Controller
         $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
-            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp');
+            ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -185,6 +186,7 @@ class BarangController extends Controller
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                 ],
             ];
         }
@@ -205,7 +207,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $barangs = Barang::where('category_id', $categoryId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',)
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage')
             ->get();
 
         if ($barangs->isEmpty()) {
@@ -237,6 +239,7 @@ class BarangController extends Controller
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                 ],
             ];
         }
@@ -248,7 +251,7 @@ class BarangController extends Controller
     }
     public function index()
     {
-        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email')->get();
+        $barangs = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email', 'mitra.profileImage')->get();
 
         if ($barangs->isEmpty()) {
             return response()->json(['message' => 'Tidak ada barang yang ditemukan'], 404);
@@ -294,7 +297,8 @@ class BarangController extends Controller
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
-                    'email' => $barang->mitra->email
+                    'email' => $barang->mitra->email,
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                 ],
             ];
         }
@@ -310,7 +314,7 @@ class BarangController extends Controller
         $barang = Barang::with([
             'category:id,name',
             'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email,image_profile',
-            'mitra.profileImage' // Memuat relasi profileImage untuk mengambil gambar profil dari model ProfileImage
+            'mitra.profileImage'
         ])->find($id);
 
         if (!$barang) {
@@ -354,7 +358,7 @@ class BarangController extends Controller
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
                 'no_whatsapp' => $barang->mitra->no_whatsapp,
-                'profile_image' => $barang->mitra->profileImage->image_profile ?? null // Mengambil image_profile dari tabel profile_images jika tersedia
+                'profile_image' => $barang->mitra->profileImage->image_profile ?? null
             ]
         ];
 
