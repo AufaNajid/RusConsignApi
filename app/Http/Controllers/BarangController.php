@@ -293,8 +293,8 @@ class BarangController extends Controller
                     'pengikut' => $barang->mitra->pengikut,
                     'penilaian' => $barang->mitra->penilaian,
                     'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                    'email' => $barang->mitra->email
                 ],
-                'email_user' => Auth::user()->email,
             ];
         }
 
