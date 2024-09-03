@@ -96,18 +96,16 @@ class ProfileController extends Controller
             } else {
                 // Create new profile image if none exists
                 $imagePath = $request->file('image_profile')->store('public/profiles');
-                $profileImage = $user->profileImages()->create([
+                $user->profileImages()->create([
                     'image_profile' => Storage::url($imagePath),
                     'mitra_id' => null,
                 ]);
             }
-
-            $user->image_profile = $profileImage->image_profile;
         }
 
         // Handle 'nama_toko' update
         if (isset($validatedData['nama_toko'])) {
-            $profileImage = $user->profileImages()->first(); // Get the first profile image
+            $profileImage = $user->profileImages()->first();
             if ($profileImage && $profileImage->mitra) {
                 $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
                 $profileImage->mitra->save();
@@ -122,6 +120,7 @@ class ProfileController extends Controller
             'user' => $user,
         ], 200);
     }
+
 
     public function postImageProfile(Request $request)
     {
