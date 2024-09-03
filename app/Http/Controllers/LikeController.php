@@ -29,6 +29,11 @@ class LikeController extends Controller
         foreach ($likes as $like) {
             $barang = $like->barang;
 
+            if (!$barang) {
+                // Jika barang null, skip loop ini
+                continue;
+            }
+
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -76,6 +81,7 @@ class LikeController extends Controller
             'likes' => $likeData,
         ], 200);
     }
+
 
 
 
