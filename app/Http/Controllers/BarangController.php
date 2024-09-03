@@ -349,17 +349,14 @@ class BarangController extends Controller
                 'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
-                'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                'no_whatsapp' => $barang->mitra->no_whatsapp,
             ],
-            'user' =>[
-                'image_profiles' => $barang->user->image_profiles,
+            'user' => [
+                'image_profiles' => $barang->user ? $barang->user->image_profiles : null,
             ]
         ];
 
-        return response()->json([
-            'message' => 'Data barang berhasil ditemuka  n',
-            'barang' => $barangData,
-        ], 200);
+        return response()->json($barangData);
     }
 
     public function addBarang(Request $request)
