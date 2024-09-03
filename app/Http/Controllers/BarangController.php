@@ -254,6 +254,7 @@ class BarangController extends Controller
             return response()->json(['message' => 'Tidak ada barang yang ditemukan'], 404);
         }
 
+
         $barangData = [];
         foreach ($barangs as $barang) {
             $rate = Komentar::select(
@@ -306,7 +307,7 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp')->find($id);
+        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email')->find($id);
 
         if (!$barang) {
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
