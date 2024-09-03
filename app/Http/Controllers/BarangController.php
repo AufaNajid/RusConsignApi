@@ -307,7 +307,7 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email,image_profiles')->find($id);
+        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email', 'user:image_profiles')->find($id);
 
         if (!$barang) {
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
@@ -350,8 +350,10 @@ class BarangController extends Controller
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
                 'no_whatsapp'=> $barang->mitra->no_whatsapp,
-                'image_profiles' => $barang->mitra->profileImages->first()->image_profile ?? null
             ],
+            'user' =>[
+                'image_profiles' => $barang->user->image_profiles,
+            ]
         ];
 
         return response()->json([
