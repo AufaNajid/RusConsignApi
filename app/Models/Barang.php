@@ -59,4 +59,9 @@ class Barang extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function profile()
+    {
+        return $this->hasOne(ProfileImage::class, 'barang_id', 'id');
+    }
 }

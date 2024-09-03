@@ -38,8 +38,5 @@ class Mitra extends Model
         return $this->hasMany(Lokasi::class);
     }
 
-    public function profileImages()
-    {
-        return $this->hasMany(ProfileImage::class);
-    }
+
 }
