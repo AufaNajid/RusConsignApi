@@ -307,7 +307,11 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email,image_profile,profileImage')->find($id);
+        $barang = Barang::with([
+            'category:id,name',
+            'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email,image_profile',
+            'mitra.profileImage' // Memuat relasi profileImage untuk mengambil gambar profil dari model ProfileImage
+        ])->find($id);
 
         if (!$barang) {
             return response()->json(['message' => 'Barang tidak ditemukan'], 404);
@@ -350,13 +354,14 @@ class BarangController extends Controller
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
                 'no_whatsapp' => $barang->mitra->no_whatsapp,
-                'image_profile' => $barang->mitra->image_profile, // Menambahkan image_profile
-                'profile_image' => $barang->mitra->profileImage->image_profile ?? null // Mengambil image_profile dari relasi profile di mitra
+                'image_profile' => $barang->mitra->image_profile, // Menggunakan image_profile dari tabel mitras
+                'profile_image' => $barang->mitra->profileImage->image_profile ?? null // Mengambil image_profile dari tabel profile_images jika tersedia
             ]
         ];
 
         return response()->json($barangData);
     }
+
 
 
     public function addBarang(Request $request)
