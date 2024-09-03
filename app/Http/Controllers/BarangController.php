@@ -350,7 +350,7 @@ class BarangController extends Controller
                 'pengikut' => $barang->mitra->pengikut,
                 'penilaian' => $barang->mitra->penilaian,
                 'no_whatsapp'=> $barang->mitra->no_whatsapp,
-                'image_profiles' => $barang->mitra->profileImages->first()->image_profile ?? null,
+                'image_profiles' => $barang->mitra->profileImages->first()->image_profiles ?? null
             ],
         ];
 
