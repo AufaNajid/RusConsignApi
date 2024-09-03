@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Komentar;
 use App\Models\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LikeController extends Controller
 {
@@ -26,6 +28,21 @@ class LikeController extends Controller
         $likeData = [];
         foreach ($likes as $like) {
             $barang = $like->barang;
+
+            // Hitung rata-rata rating barang
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barang->id)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avg = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
             $likeData[] = [
                 'id' => $like->id,
                 'created_at' => $like->created_at,
@@ -35,7 +52,7 @@ class LikeController extends Controller
                     'nama_barang' => $barang->nama_barang,
                     'deskripsi' => $barang->deskripsi,
                     'harga' => $barang->harga,
-                    'rating_barang' => $barang->rating_barang,
+                    'rating_barang' => $avg,
                     'category_id' => $barang->category->id,
                     'category_nama' => $barang->category->name,
                     'image_barang' => $barang->image_barang,
@@ -60,6 +77,8 @@ class LikeController extends Controller
             'likes' => $likeData,
         ], 200);
     }
+
+
 
     public function favorite(Request $request)
     {
