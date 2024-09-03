@@ -52,7 +52,7 @@ Route::group([
 
     Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
     Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
-    Route::post('/api-verify-email/{token}', [AuthController::class, 'apiVerifyEmail']);
+    Route::post('/verify-email/{token}', [AuthController::class, 'apiVerifyEmail']);
 
     Route::post('/send-reset-password-email', [AuthController::class, 'sendResetPasswordEmail']);
     Route::post('/reset-password-profile', [AuthController::class, 'resetpassprofile']);
