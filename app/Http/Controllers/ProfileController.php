@@ -28,11 +28,11 @@ class ProfileController extends Controller
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
                 'bio_desc' => $user->bio_desc,
-//                'image_profiles' => $user->profileImages->first()->image_profile ?? null,
+                'image_profiles' => $user->profileImages->first()->image_profile ?? null,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
                 'id_mitra' => $user->profileImages->first()->mitra->id ?? null,
-                'image_profile' => $user->profileImages->first()->mitra->image_profile ?? null,
+//                'image_profile' => $user->profileImages->first()->mitra->image_profile ?? null,
                 'nama' => $user->profileImages->first()->mitra->nama_lengkap ?? null,
                 'nama_toko' => $user->profileImages->first()->mitra->nama_toko ?? null,
                 'nis' => $user->profileImages->first()->mitra->nis ?? null,
@@ -59,58 +59,61 @@ class ProfileController extends Controller
     }
 
 
-    public function editProfile(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
+        public function editProfile(Request $request)
+        {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'bio_desc' => 'sometimes|string',
-            'image_profile' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
-            'nama_toko' => 'sometimes|string|max:255',
-        ]);
+            $validatedData = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'bio_desc' => 'sometimes|string',
+                'image_profile' => 'sometimes|image',
+                'nama_toko' => 'sometimes|string|max:255'
+            ]);
 
-        // Update user data
-        if (isset($validatedData['name'])) {
-            $user->name = $validatedData['name'];
-        }
-        if (isset($validatedData['bio_desc'])) {
-            $user->bio_desc = $validatedData['bio_desc'];
-        }
+            // Update user data
+            if (isset($validatedData['name'])) {
+                $user->name = $validatedData['name'];
+            }
+            if (isset($validatedData['bio_desc'])) {
+                $user->bio_desc = $validatedData['bio_desc'];
+            }
 
-        // Handle profile image update
-        if (isset($validatedData['image_profile'])) {
-            $profileImage = $user->profileImages()->first();
-            if ($profileImage) {
-                // Delete old image if exists
-                if (Storage::exists(str_replace('/storage', 'public', $profileImage->image_profile))) {
-                    Storage::delete(str_replace('/storage', 'public', $profileImage->image_profile));
+            if (isset($validatedData['image_profile'])) {
+                $profileImage = $user->profileImages()->first();
+                if ($profileImage) {
+                    // Delete old image if exists
+                    if (Storage::exists($profileImage->image_profile)) {
+                        Storage::delete($profileImage->image_profile);
+                    }
+                    // Store new image
+                    $imagePath = $request->file('image_profile')->store('public/profiles');
+                    $profileImage->image_profile = Storage::url($imagePath);
+                    $profileImage->save();
+                } else {
+                    // Create new profile image if none exists
+                    $imagePath = $request->file('image_profile')->store('public/profiles');
+                    $profileImage = $user->profileImages()->create([
+                        'image_profile' => Storage::url($imagePath),
+                        'mitra_id' => null,
+                    ]);
                 }
-                // Store new image
-                $imagePath = $request->file('image_profile')->store('public/profiles');
-                $profileImage->image_profile = Storage::url($imagePath);
-                $profileImage->save();
-            } else {
-                // Create new profile image if none exists
-                $imagePath = $request->file('image_profile')->store('public/profiles');
-                $user->profileImages()->create([
-                    'image_profile' => Storage::url($imagePath),
-                    'mitra_id' => null,
-                ]);
-            }
-        }
 
-        // Handle 'nama_toko' update
-        if (isset($validatedData['nama_toko'])) {
-            $profileImage = $user->profileImages()->first();
-            if ($profileImage && $profileImage->mitra) {
-                $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
-                $profileImage->mitra->save();
+                $user->image_profile = $profileImage->image_profile;
             }
-        }
+
+            // Handle 'nama_toko' update
+            if (isset($validatedData['nama_toko'])) {
+                $profileImage = $user->profileImages()->first(); // Get the first profile image
+                if ($profileImage && $profileImage->mitra) {
+                    $profileImage->mitra->nama_toko = $validatedData['nama_toko'];
+                    $profileImage->mitra->save();
+                } else {
+
+                }
+            }
 
         // Save user data
         $user->save();
@@ -120,7 +123,6 @@ class ProfileController extends Controller
             'user' => $user,
         ], 200);
     }
-
 
     public function postImageProfile(Request $request)
     {
