@@ -186,9 +186,10 @@ class AuthController extends Controller
         return response()->json(['message' => 'Email verified successfully']);
     }
 
-
+    // Fungsi kirim ulang verifikasi
     public function resendVerification(Request $request)
     {
+        $request->validate(['email' => 'required|email']);
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -206,83 +207,5 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Verification email resent successfully']);
     }
-
-    public function apiVerifyEmail(Request $request, $token)
-    {
-        $user = User::where('email_verification_token', $token)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Invalid verification token'], 404);
-        }
-
-        $user->email_verified_at = now();
-        $user->email_verification_token = null;
-        $user->save();
-
-        return response()->json(['message' => 'Email verified successfully']);
-    }
-
-//    public function sendResetPasswordEmail(Request $request)
-//    {
-//        $request->validate(['email' => 'required|email']);
-//
-//        $user = User::where('email', $request->email)->first();
-//
-//        if (!$user) {
-//            return response()->json(['message' => 'Email not found'], 404);
-//        }
-//
-//        $token = Str::random(60);
-//        $user->reset_password_token = $token;
-//        $user->save();
-//
-//        $resetLink = url('/reset-password/' . $token);
-//        Mail::to($user->email)->send(new ResetPasswordMail($user, $resetLink));
-//
-//        return response()->json(['message' => 'Reset password email sent']);
-//    }
-
-    public function resetpassprofile(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Email not found'], 404);
-        }
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['message' => 'Current password is incorrect'], 403);
-        }
-
-        $user->password = Hash::make($request->new_password);
-        $user->save();
-
-        return response()->json(['message' => 'Password has been updated successfully']);
-    }
-
-    public function reset(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-            'password' => 'required|string|min:8',
-        ]);
-
-        $user = User::where('reset_password_token', $request->token)->first();
-
-        if (!$user) {
-            return redirect()->back()->with('error', 'Invalid reset token.');
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->reset_password_token = null;
-        $user->save();
-
-        return view('completeresetpass');
-    }
 }
+

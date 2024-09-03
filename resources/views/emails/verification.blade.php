@@ -4,22 +4,17 @@
     <title>Verify Your Email</title>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Prepare the token
-            let token = "{{ request()->query('token') }}";
+            const token = "{{ $token }}"; // Ambil token dari server-side rendering
 
-            // Function to send the POST request for email verification
             function verifyEmail() {
-                fetch("{{ url('/api/verify-email') }}", {
-                    method: "POST",
+                fetch("{{ url('/api/verify-email') }}/" + token, {
+                    method: "GET", // Menggunakan GET untuk kesederhanaan
                     headers: {
-                        "Content-Type": "application/json",
                         "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({ token: token })
+                    }
                 })
                     .then(response => response.json())
                     .then(data => {
-                        // Redirect or show a success message
                         if (data.message === 'Email verified successfully') {
                             window.location.href = "/verification-success";
                         } else {
@@ -32,10 +27,9 @@
                     });
             }
 
-            // Automatically verify email on page load
+            // Verifikasi otomatis saat halaman dimuat
             verifyEmail();
 
-            // If the user clicks the button, verify email manually
             document.getElementById("verifyButton").addEventListener("click", function() {
                 verifyEmail();
             });
