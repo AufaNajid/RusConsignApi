@@ -36,21 +36,21 @@ class AuthController extends Controller
             "password" => "required|string|min:6"
         ]);
 
-        $verificationToken = Str::random(60);
+//        $verificationToken = Str::random(60);
 
         $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
             "password" => bcrypt($request->password),
             "mitra_id" => 0,
-            "email_verification_token" => $verificationToken
+//            "email_verification_token" => $verificationToken
         ]);
 
-        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
+//        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
 
         return response()->json([
             "status" => true,
-            "message" => "User registered successfully. Please check your email for verification.",
+            "message" => "User registered successfully",
             "data" => [
                 "user" => $user
             ]
@@ -167,45 +167,45 @@ class AuthController extends Controller
         }
     }
 
-    public function verifyEmail(Request $request, $token)
-    {
-        $user = User::where('email_verification_token', $token)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'Invalid or expired verification token'], 404);
-        }
-
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email already verified'], 400);
-        }
-
-        $user->email_verified_at = now();
-        $user->email_verification_token = null;
-        $user->save();
-
-        return response()->json(['message' => 'Email verified successfully']);
-    }
-
-    // Fungsi kirim ulang verifikasi
-    public function resendVerification(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email already verified'], 400);
-        }
-
-        $verificationToken = Str::random(60);
-        $user->update(['email_verification_token' => $verificationToken]);
-
-        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
-
-        return response()->json(['message' => 'Verification email resent successfully']);
-    }
+//    public function verifyEmail(Request $request, $token)
+//    {
+//        $user = User::where('email_verification_token', $token)->first();
+//
+//        if (!$user) {
+//            return response()->json(['message' => 'Invalid or expired verification token'], 404);
+//        }
+//
+//        if ($user->email_verified_at) {
+//            return response()->json(['message' => 'Email already verified'], 400);
+//        }
+//
+//        $user->email_verified_at = now();
+//        $user->email_verification_token = null;
+//        $user->save();
+//
+//        return response()->json(['message' => 'Email verified successfully']);
+//    }
+//
+//    // Fungsi kirim ulang verifikasi
+//    public function resendVerification(Request $request)
+//    {
+//        $request->validate(['email' => 'required|email']);
+//        $user = User::where('email', $request->email)->first();
+//
+//        if (!$user) {
+//            return response()->json(['message' => 'User not found'], 404);
+//        }
+//
+//        if ($user->email_verified_at) {
+//            return response()->json(['message' => 'Email already verified'], 400);
+//        }
+//
+//        $verificationToken = Str::random(60);
+//        $user->update(['email_verification_token' => $verificationToken]);
+//
+//        Mail::to($user->email)->send(new VerificationMail($user, $verificationToken));
+//
+//        return response()->json(['message' => 'Verification email resent successfully']);
+//    }
 }
 

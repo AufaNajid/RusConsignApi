@@ -30,7 +30,6 @@ class LikeController extends Controller
             $barang = $like->barang;
 
             if (!$barang) {
-                // Jika barang null, skip loop ini
                 continue;
             }
 
