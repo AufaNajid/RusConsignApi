@@ -17,15 +17,12 @@ class ResetPasswordController extends Controller
             'password' => 'required|confirmed|min:6',
         ]);
 
-        // Get the authenticated user
         $user = Auth::user();
 
-        // Check if user is authenticated
         if (!$user) {
             return response()->json(['message' => 'User not authenticated'], 401);
         }
 
-        // Update user's password
         $user->password = Hash::make($request->password);
         $user->save();
 

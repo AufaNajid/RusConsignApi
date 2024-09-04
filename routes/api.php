@@ -34,7 +34,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::delete('/users/{id}', [AuthController::class, 'destroy']);
 Route::put('/users/{user_id}/edit-bio', [AuthController::class, 'editBio']);
 Route::post('forgot-password', [ForgotPasswordController::class, 'forgot']);
-Route::post('reset-password', [ResetPasswordController::class, 'reset']);
+
 Route::post('send-otp', [OTPController::class, 'sendOTP']);
 Route::post('verify-otp', [OTPController::class, 'verifyOTP']);
 Route::post('registeradmin',[AuthadminController::class,'registeradmin']);
@@ -53,6 +53,7 @@ Route::group([
     Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail']);
     Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
     Route::post('/verify-email/{token}', [AuthController::class, 'apiVerifyEmail']);
+    Route::post('reset-password', [ResetPasswordController::class, 'reset']);
 
     Route::post('/send-reset-password-email', [AuthController::class, 'sendResetPasswordEmail']);
     Route::post('/reset-password-profile', [AuthController::class, 'resetpassprofile']);

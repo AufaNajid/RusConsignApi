@@ -93,27 +93,22 @@ class PaymentController extends Controller
             // Retrieve the invoice using the ID from the webhook request
             $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
 
-            // Find the corresponding payment record from the database
             $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
 
-            // Check if the payment status is already 'settled'
             if ($payment->status == 'settled') {
                 return response()->json([
                     "data" => "Payment has already been processed"
-                ], 200); // Return 200 OK if payment is already processed
+                ], 200);
             }
 
-            // Update the payment status based on the invoice status
             $payment->status = strtolower($getInvoice['status']);
             $payment->save();
 
-            // Return a success response
             return response()->json([
                 "data" => "Payment status updated successfully"
             ], 200);
 
         } catch (\Exception $e) {
-            // Handle errors and return a response with error message
             return response()->json([
                 "error" => $e->getMessage()
             ], 500);
