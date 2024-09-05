@@ -167,6 +167,24 @@ class AuthController extends Controller
         }
     }
 
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json(['message' => 'Password reset successfully']);
+    }
+
 //    public function verifyEmail(Request $request, $token)
 //    {
 //        $user = User::where('email_verification_token', $token)->first();

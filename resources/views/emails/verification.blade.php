@@ -27,7 +27,6 @@
                     });
             }
 
-            // Verifikasi otomatis saat halaman dimuat
             verifyEmail();
 
             document.getElementById("verifyButton").addEventListener("click", function() {

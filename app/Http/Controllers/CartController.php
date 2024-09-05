@@ -47,27 +47,34 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'barang_id' => 'required|exists:barangs,id',
-            'quantity' => 'required|integer|min:1',
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'exists:barangs,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'integer|min:1',
         ]);
 
-        $barang = Barang::find($request->barang_id);
-        $totalPrice = $barang->harga * $request->quantity;
+        $cartItems = [];
 
-        $cartItem = Cart::updateOrCreate(
-            [
-                'user_id' => Auth::id(),
-                'barang_id' => $request->barang_id,
-            ],
-            [
-                'quantity' => $request->quantity,
-                'total_price' => $totalPrice,
-            ]
-        );
+        foreach ($request->barang_id as $index => $id) {
+            $barang = Barang::find($id);
+            $totalPrice = $barang->harga * $request->quantity[$index];
 
-        $cartItem->load('barang.mitra');
+            $cartItem = Cart::updateOrCreate(
+                [
+                    'user_id' => Auth::id(),
+                    'barang_id' => $id,
+                ],
+                [
+                    'quantity' => $request->quantity[$index],
+                    'total_price' => $totalPrice,
+                ]
+            );
 
-        return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
+            $cartItem->load('barang.mitra');
+            $cartItems[] = $cartItem;
+        }
+
+        return response()->json(['message' => 'Products added to cart', 'cartItems' => $cartItems], 201);
     }
 
     public function update(Request $request, $id)
@@ -94,14 +101,27 @@ class CartController extends Controller
         return response()->json(['message' => 'Cart item updated', 'cartItem' => $cartItem], 200);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $cartItem = Cart::where('user_id', Auth::id())->where('carts_id', $id)->first();
-        if (!$cartItem) {
-            return response()->json(['message' => 'Cart item not found'], 404);
+        $validated = $request->validate([
+            'cart_id' => 'required|array',
+            'cart_id.*' => 'integer|exists:carts,id',
+        ]);
+
+        $cartItems = Cart::where('user_id', Auth::id())
+            ->whereIn('id', $validated['cart_ids'])
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'No cart items found'], 404);
         }
 
-        $cartItem->delete();
-        return response()->json(['message' => 'Cart item removed'], 200);
+        // Menghapus semua item cart yang ditemukan
+        Cart::whereIn('id', $validated['cart_ids'])
+            ->where('user_id', Auth::id())
+            ->delete();
+
+        return response()->json(['message' => 'Cart items removed'], 200);
     }
+
 }
