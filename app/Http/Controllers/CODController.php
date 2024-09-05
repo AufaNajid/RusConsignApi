@@ -37,6 +37,8 @@ class CODController extends Controller
             return response()->json(['message' => 'Jumlah barang_id dan quantity harus sama'], 400);
         }
 
+        $cods = [];
+
         // Proses setiap barang
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $barang = Barang::findOrFail($barangId);
@@ -53,7 +55,7 @@ class CODController extends Controller
             $barang->save();
 
             // Buat entry COD
-            Cod::create([
+            $cod = Cod::create([
                 'barang_id' => $barangId,
                 'lokasi_id' => $validatedData['lokasi_id'],
                 'quantity' => $quantity,
@@ -62,12 +64,18 @@ class CODController extends Controller
                 'user_id' => Auth::id(),
                 'mitra_id' => $barang->mitra->id,
             ]);
+
+            $cod->load('barang', 'lokasi', 'barang.mitra');
+
+            $cods[] = $cod;
         }
 
         return response()->json([
             'message' => 'Pembayaran berhasil ditambahkan',
+            'cods' => $cods
         ], 201);
     }
+
 
 
     public function updateStatus(Request $request, $id)
