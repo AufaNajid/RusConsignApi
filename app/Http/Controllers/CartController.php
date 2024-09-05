@@ -53,29 +53,36 @@ class CartController extends Controller
             'quantity.*' => 'integer|min:1',
         ]);
 
+        $userId = Auth::id();
         $cartItems = [];
 
         foreach ($request->barang_id as $index => $barangId) {
+            $quantity = $request->quantity[$index] ?? 1;
+
             $barang = Barang::find($barangId);
-            $totalPrice = $barang->harga * $request->quantity[$index];
+            if (!$barang) {
+                return response()->json(['message' => 'Barang not found'], 404);
+            }
+
+            $totalPrice = $barang->harga * $quantity;
 
             $cartItem = Cart::updateOrCreate(
                 [
-                    'user_id' => Auth::id(),
+                    'user_id' => $userId,
                     'barang_id' => $barangId,
                 ],
                 [
-                    'quantity' => $request->quantity[$index],
+                    'quantity' => $quantity,
                     'total_price' => $totalPrice,
                 ]
             );
 
-            $cartItem->load('barang.mitra');
-            $cartItems[] = $cartItem;
+            $cartItems[] = $cartItem->load('barang.mitra');
         }
 
         return response()->json(['message' => 'Products added to cart', 'cartItems' => $cartItems], 201);
     }
+
 
     public function update(Request $request, $id)
     {

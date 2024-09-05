@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('barang_id')->constrained('barangs');
             $table->foreignId('lokasi_id')->constrained('lokasis');
+            $table->foreignId('payment')->constrained('lokasis');
             $table->timestamps();
         });
     }
