@@ -55,14 +55,14 @@ class CartController extends Controller
 
         $cartItems = [];
 
-        foreach ($request->barang_id as $index => $id) {
-            $barang = Barang::find($id);
+        foreach ($request->barang_id as $index => $barangId) {
+            $barang = Barang::find($barangId);
             $totalPrice = $barang->harga * $request->quantity[$index];
 
             $cartItem = Cart::updateOrCreate(
                 [
                     'user_id' => Auth::id(),
-                    'barang_id' => $id,
+                    'barang_id' => $barangId,
                 ],
                 [
                     'quantity' => $request->quantity[$index],
