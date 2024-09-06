@@ -46,22 +46,12 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        // Mengurai JSON ke array
-        $request->merge([
-            'barang_id' => json_decode($request->input('barang_id')),
-            'quantity' => json_decode($request->input('quantity')),
-        ]);
-
-        // Validasi
         $request->validate([
-            'barang_id' => 'required|array',
-            'barang_id.*' => 'exists:barangs,id',
+            'barang_id' => 'exists:barangs,id',
             'quantity' => 'required|array',
-            'quantity.*' => 'integer|min:1',
         ]);
 
         $userId = Auth::id();
-        $cartItems = [];
 
         foreach ($request->barang_id as $index => $barangId) {
             $quantity = $request->quantity[$index] ?? 1;
