@@ -47,62 +47,27 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'barang_id' => 'exists:barangs,id',
-            'quantity' => 'integer|min:1',
-        ]);
-
-        $userId = Auth::id();
-
-        foreach ($request->barang_id as $index => $barangId) {
-            $quantity = $request->quantity[$index] ?? 1;
-
-            $barang = Barang::find($barangId);
-            if (!$barang) {
-                return response()->json(['message' => 'Barang not found'], 404);
-            }
-
-            $totalPrice = $barang->harga * $quantity;
-
-            $cartItem = Cart::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'barang_id' => $barangId,
-                ],
-                [
-                    'quantity' => $quantity,
-                    'total_price' => $totalPrice,
-                ]
-            );
-
-            $cartItems[] = $cartItem->load('barang.mitra');
-        }
-
-        return response()->json(['message' => 'Products added to cart', 'cartItems' => $cartItems], 201);
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
+            'barang_id' => 'required|exists:barangs,id|array',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cartItem = Cart::where('user_id', Auth::id())->where('carts_id', $id)->first();
-
-        if (!$cartItem) {
-            return response()->json(['message' => 'Cart item not found'], 404);
-        }
-
-        $barang = Barang::find($cartItem->barang_id);
+        $barang = Barang::find($request->barang_id);
         $totalPrice = $barang->harga * $request->quantity;
 
-        $cartItem->quantity = $request->quantity;
-        $cartItem->total_price = $totalPrice;
-        $cartItem->save();
+        $cartItem = Cart::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'barang_id' => $request->barang_id,
+            ],
+            [
+                'quantity' => $request->quantity,
+                'total_price' => $totalPrice,
+            ]
+        );
 
         $cartItem->load('barang.mitra');
 
-        return response()->json(['message' => 'Cart item updated', 'cartItem' => $cartItem], 200);
+        return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
     }
 
     public function destroy(Request $request)

@@ -23,60 +23,44 @@ class CODController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
         $validatedData = $request->validate([
-            'barang_id' => 'required|array',
-            'barang_id.*' => 'exists:barangs,id',
-            'quantity' => 'required|array',
-            'quantity.*' => 'integer|min:1',
-            'lokasi_id' => 'required|exists:lokasis,id'
+            'barang_id' => 'required|exists:barangs,id',
+            'lokasi_id' => 'required|exists:lokasis,id',
+            'quantity' => 'required|integer',
         ]);
 
-        // Pastikan jumlah item di barang_id dan quantity sama
-        if (count($validatedData['barang_id']) !== count($validatedData['quantity'])) {
-            return response()->json(['message' => 'Jumlah barang_id dan quantity harus sama'], 400);
+        $barang = Barang::findOrFail($validatedData['barang_id']);
+        $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
+        $user = Auth::user();
+
+        if ($barang->stock_barang < $validatedData['quantity']) {
+            return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
         }
 
-        $cods = [];
+        $totalAmount = $barang->harga * $validatedData['quantity'];
 
-        // Proses setiap barang
-        foreach ($validatedData['barang_id'] as $index => $barangId) {
-            $barang = Barang::findOrFail($barangId);
-            $quantity = $validatedData['quantity'][$index];
+        // Update the stock
+        $barang->stock_barang -= $validatedData['quantity'];
+        $barang->save();
 
-            if ($barang->stock_barang < $quantity) {
-                return response()->json(['message' => 'Stok barang tidak mencukupi untuk barang ID: ' . $barangId], 400);
-            }
-
-            $totalAmount = $barang->harga * $quantity;
-
-            // Update stok barang
-            $barang->stock_barang -= $quantity;
-            $barang->save();
-
-            // Buat entry COD
-            $cod = Cod::create([
-                'barang_id' => $barangId,
-                'lokasi_id' => $validatedData['lokasi_id'],
-                'quantity' => $quantity,
-                'status_pembayaran' => 'belum_pembayaran',
-                'grand_total' => $totalAmount,
-                'user_id' => Auth::id(),
-                'mitra_id' => $barang->mitra->id,
-            ]);
-
-            $cod->load('barang', 'lokasi', 'barang.mitra');
-
-            $cods[] = $cod;
-        }
+        $cod = Cod::create([
+            'barang_id' => $validatedData['barang_id'],
+            'lokasi_id' => $validatedData['lokasi_id'],
+            'quantity' => $validatedData['quantity'],
+            'status_pembayaran' => 'belum_pembayaran',
+            'grand_total' => $totalAmount,
+            'user_id' => $user->id,
+            'mitra_id' => $barang->mitra->id,
+        ]);
 
         return response()->json([
             'message' => 'Pembayaran berhasil ditambahkan',
-            'cods' => $cods
+            'cod' => $cod,
+            'product' => $barang,
+            'lokasi' => $lokasi,
+            'user' => $user
         ], 201);
     }
-
-
 
     public function updateStatus(Request $request, $id)
         {
