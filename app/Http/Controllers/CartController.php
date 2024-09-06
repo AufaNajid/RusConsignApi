@@ -48,7 +48,7 @@ class CartController extends Controller
     {
         $request->validate([
             'barang_id' => 'exists:barangs,id',
-            'quantity' => 'required|array',
+            'quantity' => 'integer|min:1',
         ]);
 
         $userId = Auth::id();
