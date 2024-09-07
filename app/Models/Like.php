@@ -27,4 +27,8 @@ class Like extends Model
         return $this->hasOne(ProfileImage::class, 'likeId', 'id');
     }
 
+    public function mitra()
+    {
+        return $this->belongsTo(Mitra::class, 'mitra_id');
+    }
 }
