@@ -39,7 +39,7 @@ class LikeController extends Controller
 
         return response()->json([
             "message" => "Data Like berhasil ditemukan",
-            "cart" => $likeItems,
+            "Like" => $likeItems,
         ], 200);
     }
 
