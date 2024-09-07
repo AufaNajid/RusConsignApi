@@ -220,29 +220,39 @@ class CartController extends Controller
     }
 
 
-        public function destroySelected(Request $request)
-        {
-            $request->validate([
-                'cart_ids' => 'required|string',
-            ]);
+    public function destroySelected(Request $request)
+    {
+        $request->validate([
+            'cart_ids' => 'required|string', // Expecting a comma-separated string of cart IDs
+        ]);
 
-            $cartIds = explode(',', $request->input('cart_ids'));
-            $cartItems = Cart::where('user_id', Auth::id())
-                ->whereIn('carts_id', $cartIds)
-                ->get();
+        $cartIds = explode(',', $request->input('cart_ids'));
 
-            if ($cartItems->isEmpty()) {
-                return response()->json(['message' => 'tidak ada'], 404);
-            }
-
-            Cart::where('user_id', Auth::id())
-                ->whereIn('carts_id', $cartIds)
-                ->delete();
-
-            return response()->json([
-                'message' => 'Selected cart items removed',
-                'deleted_items' => $cartItems
-            ], 200);
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
         }
+
+        // Fetch the cart items to be deleted
+        $cartItems = Cart::where('user_id', Auth::id())
+            ->whereIn('id', $cartIds)  // Perubahan dari 'carts_id' menjadi 'id'
+            ->get();
+
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
+        }
+
+        // Delete the selected cart items
+        Cart::where('user_id', $user->id)
+            ->whereIn('carts_id', $cartIds)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Selected cart items removed',
+            'deleted_items' => $cartItems
+        ], 200);
+    }
+
 
 }
