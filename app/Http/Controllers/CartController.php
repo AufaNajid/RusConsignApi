@@ -73,9 +73,9 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        // Mengubah input 'cart_id' menjadi array jika dikirim dalam format JSON string
+        // Mengubah input 'carts_id' menjadi array jika dikirim dalam format JSON string
         $request->merge([
-            'cart_id' => is_string($request->input('cart_id')) ? json_decode($request->input('cart_id'), true) : $request->input('cart_id'),
+            'carts_id' => is_string($request->input('carts_id')) ? json_decode($request->input('carts_id'), true) : $request->input('carts_id'),
         ]);
 
         // Validasi
@@ -86,7 +86,7 @@ class CartController extends Controller
 
         // Ambil item yang dipilih dari cart
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $validated['carts_id'])
+            ->whereIn('id', $validated['carts_id'])
             ->with('barang.mitra')
             ->get();
 
@@ -99,6 +99,7 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
 
     public function checkoutSelectedItems(Request $request)
