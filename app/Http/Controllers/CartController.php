@@ -227,20 +227,17 @@ class CartController extends Controller
                 'cart_id' => 'required|integer|exists:carts,id',
             ]);
 
-            $cartIds = $request->input('cart_ids');
-
-            // Ambil item cart yang sesuai dengan cart_ids
+            $cartIds = explode(',', $request->input('cart_ids'));
             $cartItems = Cart::where('user_id', Auth::id())
-                ->whereIn('id', $cartIds) // Pastikan kolom yang benar digunakan
+                ->whereIn('carts_id', $cartIds)
                 ->get();
 
             if ($cartItems->isEmpty()) {
                 return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
             }
 
-            // Hapus item cart yang sesuai dengan cart_ids
             Cart::where('user_id', Auth::id())
-                ->whereIn('carts_id', $cartIds) // Pastikan kolom yang benar digunakan
+                ->whereIn('carts_id', $cartIds)
                 ->delete();
 
             return response()->json([
