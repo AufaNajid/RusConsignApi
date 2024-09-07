@@ -22,4 +22,9 @@ class Like extends Model
         return $this->belongsTo(Barang::class, 'barang_id'); // Relasi ke model Barang
     }
 
+    public function profile()
+    {
+        return $this->hasOne(ProfileImage::class, 'likeId', 'id');
+    }
+
 }
