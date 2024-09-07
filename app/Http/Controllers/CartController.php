@@ -6,7 +6,6 @@ use App\Models\Barang;
 use App\Models\Cart;
 use App\Models\Cod;
 use App\Models\Komentar;
-use App\Models\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,11 +21,11 @@ class CartController extends Controller
         }
 
         $carts = Cart::where('user_id', $user->id)
-            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage')
+            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'barang.mitra.profileImage')
             ->get();
 
         if ($carts->isEmpty()) {
-            return response()->json(['message' => 'No likes found'], 404);
+            return response()->json(['message' => 'No carts found'], 404);
         }
 
         $cartsData = [];
@@ -37,6 +36,7 @@ class CartController extends Controller
                 continue;
             }
 
+            // Hitung rating
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -50,9 +50,13 @@ class CartController extends Controller
                     return $carry + ($item->total * $item->rate);
                 }, 0) / ($total ?: 1);
 
+            // Hitung total harga (total price)
+            $totalPrice = $barang->harga * $cart->quantity;
+
             $cartsData[] = [
                 'cart_id' => $cart->carts_id,
                 'quantity' => $cart->quantity,
+                'total_price' => $totalPrice, // Tambahkan total harga di sini
                 'barang' => [
                     'id' => $barang->id,
                     'nama_barang' => $barang->nama_barang,
@@ -87,6 +91,7 @@ class CartController extends Controller
             'carts' => $cartsData,
         ], 200);
     }
+
 
     public function store(Request $request)
     {
