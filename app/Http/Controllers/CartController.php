@@ -136,18 +136,15 @@ class CartController extends Controller
 
         $cartIds = explode(',', $request->input('cart_ids'));
 
-        // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
-        // Jika tidak ada data ditemukan
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
-        // Kirim data yang ditemukan sebagai respons JSON
         return response()->json([
             'message' => 'Selected cart items found',
             'selected_cart_items' => $selectedCartItems,
@@ -157,22 +154,18 @@ class CartController extends Controller
 
     public function checkoutSelectedItems(Request $request)
     {
-        // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
         $request->validate([
             'cart_ids' => 'required|string',
         ]);
 
-        // Mengubah string cart_ids menjadi array integer
         $cartIds = explode(',', $request->input('cart_ids'));
 
-        // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds) // Ganti 'id' dengan 'carts_id'
+            ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
-        // Jika tidak ada data ditemukan
-        if ($selectedCartItems->isEmpty()) {
+            if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
@@ -209,23 +202,19 @@ class CartController extends Controller
 
     public function destroy($id, Request $request)
     {
-        // Periksa apakah user sudah terautentikasi
         $user = Auth::user();
         if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        // Cari item cart berdasarkan ID dan user yang sedang login
         $cart = Cart::where('user_id', $user->id)
             ->where('carts_id', $id)
             ->first();
 
-        // Jika item cart tidak ditemukan
         if (!$cart) {
             return response()->json(['message' => 'Cart item not found'], 404);
         }
 
-        // Hapus item cart
         $cart->delete();
 
         return response()->json(['message' => 'Cart item removed'], 200);
@@ -234,31 +223,29 @@ class CartController extends Controller
 
         public function destroySelected(Request $request)
         {
-
             $request->validate([
                 'cart_id' => 'required|integer|exists:carts,id',
             ]);
 
-            $cartIds = explode(',', $request->input('cart_ids'));
+            $cartIds = $request->input('cart_ids');
 
+            // Ambil item cart yang sesuai dengan cart_ids
             $cartItems = Cart::where('user_id', Auth::id())
-                ->whereIn('carts_id', $cartIds)
+                ->whereIn('id', $cartIds) // Pastikan kolom yang benar digunakan
                 ->get();
 
-            // Jika tidak ada data ditemukan
             if ($cartItems->isEmpty()) {
                 return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
             }
 
-            // Hapus barang dari cart berdasarkan carts_id
+            // Hapus item cart yang sesuai dengan cart_ids
             Cart::where('user_id', Auth::id())
-                ->whereIn('carts_id', $cartIds)
+                ->whereIn('carts_id', $cartIds) // Pastikan kolom yang benar digunakan
                 ->delete();
 
-            // Kirim respons JSON yang benar
             return response()->json([
                 'message' => 'Selected cart items removed',
-                'deleted_items' => $cartItems // Menyertakan item yang dihapus dalam respons
+                'deleted_items' => $cartItems
             ], 200);
         }
 
