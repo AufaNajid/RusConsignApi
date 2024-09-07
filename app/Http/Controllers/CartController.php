@@ -79,7 +79,7 @@ class CartController extends Controller
         ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['cart_ids'])
+            ->whereIn('id', $validated['cart_id'])
             ->with('barang.mitra')
             ->get();
 
@@ -92,6 +92,7 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
     public function checkoutSelectedItems(Request $request)
     {
@@ -116,12 +117,9 @@ class CartController extends Controller
                 return response()->json(['message' => 'Insufficient stock for item: ' . $barang->nama_barang], 400);
             }
 
-            // Kurangi stok barang
             $barang->stock_barang -= $cartItem->quantity;
             $barang->save();
 
-            // Simpan data checkout (misalnya dalam tabel baru atau dalam bentuk order)
-            // Di sini hanya ditampilkan pesan success
         }
 
         // Hapus barang dari cart setelah checkout
