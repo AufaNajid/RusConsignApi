@@ -244,7 +244,7 @@ class CartController extends Controller
 
         // Delete the selected cart items
         $deleted = Cart::where('user_id', $user->id)
-            ->whereIn('id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
+            ->whereIn('carts_id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
             ->delete();
 
         if ($deleted === 0) {
