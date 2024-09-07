@@ -16,7 +16,7 @@ return new class extends Migration
 //            $table->unsignedBigInteger('barang_id')->references('id')->on('barangs')->onDelete('cascade');
             $table->foreignId('barang_id')->onDelete('cascade');
             $table->foreignid('user_id');
-            $table->integer('quantity')->default(1);
+            $table->integer ('quantity')->default(1);
             $table->decimal('total_price', 10, 2);
             $table->timestamps();
         });

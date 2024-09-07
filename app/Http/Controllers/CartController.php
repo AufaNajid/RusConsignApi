@@ -211,7 +211,7 @@ class CartController extends Controller
 
         // Cari item cart berdasarkan ID dan user yang sedang login
         $cart = Cart::where('user_id', $user->id)
-            ->where('id', $id)
+            ->where('carts_id', $id)
             ->first();
 
         // Jika item cart tidak ditemukan
@@ -228,7 +228,7 @@ class CartController extends Controller
 
     public function destroySelected(Request $request)
     {
-        // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
+
         $request->validate([
             'cart_id' => 'required|integer|exists:carts,id',
         ]);
