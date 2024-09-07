@@ -44,7 +44,6 @@ class CartController extends Controller
                 continue;
             }
 
-            // Hitung rating
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
                 'rate'
@@ -62,9 +61,9 @@ class CartController extends Controller
             $totalPrice = $barang->harga * $cart->quantity;
 
             $cartsData[] = [
-                'cart_id' => $cart->carts_id, // Mengganti `carts_id` dengan `id`
+                'cart_id' => $cart->carts_id,
                 'quantity' => $cart->quantity,
-                'total_price' => $totalPrice, // Tambahkan total harga di sini
+                'total_price' => $totalPrice,
                 'barang' => [
                     'id' => $barang->id,
                     'nama_barang' => $barang->nama_barang,
@@ -224,7 +223,7 @@ class CartController extends Controller
         public function destroySelected(Request $request)
         {
             $request->validate([
-                'cart_id' => 'required|integer|exists:carts,id',
+                'cart_ids' => 'required|string',
             ]);
 
             $cartIds = explode(',', $request->input('cart_ids'));
