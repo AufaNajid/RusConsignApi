@@ -200,28 +200,31 @@ class CartController extends Controller
 
 
 
-    public function destroy(Request $request)
+    public function destroy($id, Request $request)
     {
+        // Validasi ID yang diterima adalah integer dan ada di tabel carts
         $validated = $request->validate([
-            'cart_id' => 'required|array',
-            'cart_id.*' => 'integer|exists:carts,id',
+            'cart_id' => 'integer|exists:carts,id',
         ]);
 
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['cart_ids'])
-            ->get();
+        // Ambil ID dari parameter route
+        $cartId = $id;
 
-        if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'No cart items found'], 404);
+        // Cari item cart berdasarkan ID dan user yang sedang login
+        $cartItem = Cart::where('id', $cartId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$cartItem) {
+            return response()->json(['message' => 'Cart item not found'], 404);
         }
 
-        // Menghapus semua item cart yang ditemukan
-        Cart::whereIn('id', $validated['cart_ids'])
-            ->where('user_id', Auth::id())
-            ->delete();
+        // Hapus item cart
+        $cartItem->delete();
 
-        return response()->json(['message' => 'Cart items removed'], 200);
+        return response()->json(['message' => 'Cart item removed'], 200);
     }
+
 
     public function destroySelected(Request $request)
     {
