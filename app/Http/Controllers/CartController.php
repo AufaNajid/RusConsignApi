@@ -232,7 +232,7 @@ class CartController extends Controller
                 ->get();
 
             if ($cartItems->isEmpty()) {
-                return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
+                return response()->json(['message' => 'tidak ada'], 404);
             }
 
             Cart::where('user_id', Auth::id())
