@@ -100,7 +100,7 @@ class LikeController extends Controller
             'barang_id' => $request->barang_id,
         ]);
 
-        $like->load('barang');
+        $like->load('barang.mitra');
 
         return response()->json(['message' => 'Product liked', 'like' => $like], 200);
     }
