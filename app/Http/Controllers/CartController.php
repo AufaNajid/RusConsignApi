@@ -9,7 +9,6 @@ use App\Models\Komentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
@@ -74,19 +73,13 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        $cartIds = $request->query('cart_ids');
-
-        // Mengubah parameter menjadi array dari string
-        $cartIdsArray = explode(',', $cartIds);
-
-        // Validasi input
-        $validated = Validator::make(['cart_ids' => $cartIdsArray], [
+        $validated = $request->validate([
             'cart_ids' => 'required|array',
-            'cart_ids.*' => 'integer|exists:carts,carts_id',
-        ])->validate();
+            'cart_ids.*' => 'integer|exists:carts,carts_id', // Pastikan nama kolom sesuai dengan database
+        ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $validated['cart_ids'])
+            ->whereIn('carts_id', $validated['cart_ids']) // Gunakan 'carts_id' jika kolom di database
             ->with('barang.mitra')
             ->get();
 
@@ -99,7 +92,6 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
-
 
 
 
