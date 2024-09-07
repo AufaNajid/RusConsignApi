@@ -225,22 +225,34 @@ class CartController extends Controller
 
     public function destroySelected(Request $request)
     {
-        $validated = $request->validate([
-            'barang_id' => 'required|array',
-            'barang_id.*' => 'integer|exists:carts,barang_id',
+        // Validasi input - pastikan barang_id adalah string yang dipisahkan oleh koma
+        $request->validate([
+            'barang_ids' => 'required|string',
         ]);
 
-        $user_id = Auth::id();
+        // Mengubah string barang_ids menjadi array integer
+        $barangIds = explode(',', $request->input('barang_ids'));
 
-        $deleted = Cart::where('user_id', $user_id)
-            ->whereIn('barang_id', $validated['barang_id'])
-            ->delete();
+        // Ambil data dari cart berdasarkan IDs yang diberikan
+        $cartItems = Cart::where('user_id', Auth::id())
+            ->whereIn('barang_id', $barangIds)
+            ->get();
 
-        if ($deleted === 0) {
-            return response()->json(['message' => 'No cart items found for the selected barang_id'], 404);
+        // Jika tidak ada data ditemukan
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'No cart items found for the selected barang_ids'], 404);
         }
 
-        return response()->json(['message' => 'Selected cart items removed'], 200);
+        // Hapus barang dari cart
+        Cart::where('user_id', Auth::id())
+            ->whereIn('barang_id', $barangIds)
+            ->delete();
+
+        // Kirim respons JSON yang benar
+        return response()->json([
+            'message' => 'Selected cart items removed',
+            'deleted_items' => $cartItems // Menyertakan item yang dihapus dalam respons
+        ], 200);
     }
 
 }
