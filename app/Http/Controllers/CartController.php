@@ -112,7 +112,7 @@ class CartController extends Controller
 
         // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds)
+            ->whereIn('carts_id', $cartIds) // Ganti 'id' dengan 'carts_id'
             ->with('barang.mitra')
             ->get();
 
@@ -136,12 +136,13 @@ class CartController extends Controller
         }
 
         // Hapus barang dari cart setelah checkout
-        Cart::whereIn('id', $cartIds)
-            ->where('user_id', Auth::id())
+        Cart::whereIn('carts_id', $cartIds) // Ganti 'id' dengan 'carts_id'
+        ->where('user_id', Auth::id())
             ->delete();
 
         return response()->json(['message' => 'Checkout successful'], 200);
     }
+
 
 
 
