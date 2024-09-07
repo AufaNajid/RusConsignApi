@@ -80,13 +80,13 @@ class CartController extends Controller
 
         // Validasi
         $validated = $request->validate([
-            'cart_id' => 'required|array',
-            'cart_id.*' => 'integer|exists:carts,id',
+            'carts_id' => 'required|array',
+            'carts_id.*' => 'integer|exists:carts,id',
         ]);
 
         // Ambil item yang dipilih dari cart
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['cart_id'])
+            ->whereIn('carts_id', $validated['carts_id'])
             ->with('barang.mitra')
             ->get();
 
