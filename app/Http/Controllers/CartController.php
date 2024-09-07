@@ -62,7 +62,7 @@ class CartController extends Controller
             $totalPrice = $barang->harga * $cart->quantity;
 
             $cartsData[] = [
-                'cart_id' => $cart->id, // Mengganti `carts_id` dengan `id`
+                'cart_id' => $cart->id, // Pastikan nama kolom yang benar
                 'quantity' => $cart->quantity,
                 'total_price' => $totalPrice, // Tambahkan total harga di sini
                 'barang' => [
@@ -99,7 +99,6 @@ class CartController extends Controller
             'carts' => $cartsData,
         ], 200);
     }
-
 
 
     public function store(Request $request)
