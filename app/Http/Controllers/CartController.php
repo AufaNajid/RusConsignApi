@@ -74,8 +74,8 @@ class CartController extends Controller
     public function selectCartItems(Request $request)
     {
         $validated = $request->validate([
-            'cart_id' => 'required|array',
-            'cart_id.*' => 'integer|exists:carts,id',
+            'cart_ids' => 'required|array',
+            'cart_ids.*' => 'integer|exists:carts,id',
         ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
