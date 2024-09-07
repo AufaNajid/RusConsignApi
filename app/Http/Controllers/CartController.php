@@ -235,24 +235,28 @@ class CartController extends Controller
 
         // Fetch the cart items to be deleted
         $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds)  // Perubahan dari 'carts_id' menjadi 'id'
+            ->whereIn('id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
             ->get();
 
-
         if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
+            return response()->json(['message' => 'Cart item not found'], 404);
         }
 
         // Delete the selected cart items
-        Cart::where('user_id', $user->id)
-            ->whereIn('carts_id', $cartIds)
+        $deleted = Cart::where('user_id', $user->id)
+            ->whereIn('id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
             ->delete();
+
+        if ($deleted === 0) {
+            return response()->json(['message' => 'Cart item not found'], 404);
+        }
 
         return response()->json([
             'message' => 'Selected cart items removed',
             'deleted_items' => $cartItems
         ], 200);
     }
+
 
 
 }
