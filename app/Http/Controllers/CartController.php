@@ -73,17 +73,13 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        $request->merge([
-            'carts_id' => is_string($request->input('carts_id')) ? json_decode($request->input('carts_id'), true) : $request->input('carts_id'),
-        ]);
-
         $validated = $request->validate([
-            'carts_id' => 'required|array',
-            'carts_id.*' => 'integer|exists:carts,id',
+            'cart_id' => 'required|array',
+            'cart_id.*' => 'integer|exists:carts,id',
         ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['carts_id'])
+            ->whereIn('id', $validated['cart_id'])
             ->with('barang.mitra')
             ->get();
 
@@ -91,12 +87,12 @@ class CartController extends Controller
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
+
         return response()->json([
             'message' => 'Selected cart items found',
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
-
 
 
     public function checkoutSelectedItems(Request $request)
