@@ -70,7 +70,7 @@ class LikeController extends Controller
                         'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                         'pengikut' => $barang->mitra->pengikut,
                         'penilaian' => $barang->mitra->penilaian,
-                        'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                        'no_whatsapp' => $barang->mitra->no_whatsapp,
                         'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                     ],
                 ],
