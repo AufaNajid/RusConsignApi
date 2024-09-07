@@ -73,16 +73,18 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
+        // Mengubah input 'cart_id' menjadi array jika dikirim dalam format JSON string
         $request->merge([
-            'cart_id' => json_decode($request->input('cart_id')),
+            'cart_id' => is_string($request->input('cart_id')) ? json_decode($request->input('cart_id'), true) : $request->input('cart_id'),
         ]);
 
         // Validasi
-        $request->validate([
+        $validated = $request->validate([
             'cart_id' => 'required|array',
-            'cart_id.*' => 'exists:carts,id',
+            'cart_id.*' => 'integer|exists:carts,id',
         ]);
 
+        // Ambil item yang dipilih dari cart
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('id', $validated['cart_id'])
             ->with('barang.mitra')
@@ -91,7 +93,6 @@ class CartController extends Controller
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
-
 
         return response()->json([
             'message' => 'Selected cart items found',
