@@ -235,7 +235,7 @@ class CartController extends Controller
 
         // Fetch the cart items to be deleted
         $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $cartIds)  // Perubahan dari 'carts_id' menjadi 'id'
+            ->whereIn('carts_id', $cartIds)  // Perubahan dari 'carts_id' menjadi 'id'
             ->get();
 
 
