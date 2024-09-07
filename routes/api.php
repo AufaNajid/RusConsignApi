@@ -9,9 +9,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatMessageController;
-use App\Http\Controllers\JasaController;
 use App\Http\Controllers\LikeController;
-use App\Http\Controllers\MitraController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OTPController;
 use App\Http\Controllers\PaymentController;
@@ -85,7 +83,7 @@ Route::group([
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::post('/cart/remove-selected', [CartController::class, 'destroySelected']);
-    Route::post('/cart/select-item', [CartController::class, 'selectCartItems']);
+    Route::post('/cart/select-item', [CartController::class, 'se']);
     Route::post('/cart/checkout', [CartController::class, 'checkoutSelectedItems']);
 
 
