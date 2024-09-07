@@ -73,25 +73,32 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        $validated = $request->validate([
-            'cart_ids' => 'required|array',
-            'cart_ids.*' => 'integer|exists:carts,carts_id', // Pastikan nama kolom sesuai dengan database
+        // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
+        $request->validate([
+            'cart_ids' => 'required|string',
         ]);
 
+        // Mengubah string cart_ids menjadi array integer
+        $cartIds = explode(',', $request->input('cart_ids'));
+
+        // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $validated['cart_ids']) // Gunakan 'carts_id' jika kolom di database
+            ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
+        // Jika tidak ada data ditemukan
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
+        // Kirim data yang ditemukan sebagai respons JSON
         return response()->json([
             'message' => 'Selected cart items found',
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
 
 
