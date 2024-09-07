@@ -112,7 +112,7 @@ class CartController extends Controller
 
         // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $cartIds)
+            ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
