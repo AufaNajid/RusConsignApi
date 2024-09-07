@@ -135,8 +135,6 @@ class CartController extends Controller
             // Kurangi stok barang
             $barang->stock_barang -= $cartItem->quantity;
             $barang->save();
-
-            // Tambahkan detail barang yang dicheckout ke array
             $checkedOutItems[] = [
                 'nama_barang' => $barang->nama_barang,
                 'quantity' => $cartItem->quantity,
@@ -144,8 +142,8 @@ class CartController extends Controller
             ];
         }
 
-        // Hapus barang dari cart setelah checkout
-        Cart::whereIn('carts_id', $cartIds) // Ganti 'id' dengan 'carts_id'
+
+        Cart::whereIn('carts_id', $cartIds)
         ->where('user_id', Auth::id())
             ->delete();
 
@@ -154,7 +152,6 @@ class CartController extends Controller
             'checked_out_items' => $checkedOutItems
         ], 200);
     }
-
 
 
 
