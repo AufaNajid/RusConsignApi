@@ -52,6 +52,7 @@ class CartController extends Controller
 
             $cartsData[] = [
                 'cart_id' => $cart->carts_id,
+                'quantity' => $cart->quantity,
                 'barang' => [
                     'id' => $barang->id,
                     'nama_barang' => $barang->nama_barang,
