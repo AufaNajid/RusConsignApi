@@ -51,9 +51,7 @@ class CartController extends Controller
                 }, 0) / ($total ?: 1);
 
             $cartsData[] = [
-                'id' => $cart->likeid,
-                'created_at' => $cart->created_at,
-                'updated_at' => $cart->updated_at,
+                'id' => $cart->carts_id,
                 'barang' => [
                     'id' => $barang->id,
                     'nama_barang' => $barang->nama_barang,

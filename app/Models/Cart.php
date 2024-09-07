@@ -17,5 +17,10 @@ class Cart extends Model
         return $this->belongsTo(Barang::class, 'barang_id');
     }
 
+    public function mitra()
+    {
+        return $this->belongsTo(Mitra::class, 'mitra_id');
+    }
+
 
 }
