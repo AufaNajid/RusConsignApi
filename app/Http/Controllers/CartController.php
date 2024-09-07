@@ -96,9 +96,6 @@ class CartController extends Controller
         ], 200);
     }
 
-
-
-
     public function checkoutSelectedItems(Request $request)
     {
         $validated = $request->validate([
