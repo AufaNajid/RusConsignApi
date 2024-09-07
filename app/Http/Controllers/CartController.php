@@ -227,7 +227,7 @@ class CartController extends Controller
     {
         // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
         $request->validate([
-            'cart_ids' => 'required|string',
+            'cart_id' => 'required|integer|exists:carts,id',
         ]);
 
         // Mengubah string cart_ids menjadi array integer
