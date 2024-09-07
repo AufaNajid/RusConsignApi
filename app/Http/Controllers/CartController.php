@@ -121,6 +121,8 @@ class CartController extends Controller
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
+        $checkedOutItems = [];
+
         // Proses checkout
         foreach ($selectedCartItems as $cartItem) {
             $barang = $cartItem->barang;
@@ -133,6 +135,13 @@ class CartController extends Controller
             // Kurangi stok barang
             $barang->stock_barang -= $cartItem->quantity;
             $barang->save();
+
+            // Tambahkan detail barang yang dicheckout ke array
+            $checkedOutItems[] = [
+                'nama_barang' => $barang->nama_barang,
+                'quantity' => $cartItem->quantity,
+                'total_harga' => $barang->harga * $cartItem->quantity,
+            ];
         }
 
         // Hapus barang dari cart setelah checkout
@@ -140,8 +149,12 @@ class CartController extends Controller
         ->where('user_id', Auth::id())
             ->delete();
 
-        return response()->json(['message' => 'Checkout successful'], 200);
+        return response()->json([
+            'message' => 'Checkout successful',
+            'checked_out_items' => $checkedOutItems
+        ], 200);
     }
+
 
 
 
