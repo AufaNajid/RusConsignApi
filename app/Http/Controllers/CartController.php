@@ -79,7 +79,7 @@ class CartController extends Controller
         ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['cart_id'])
+            ->whereIn('id', $validated['cart_id']) // Menggunakan 'cart_id'
             ->with('barang.mitra')
             ->get();
 
