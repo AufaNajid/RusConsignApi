@@ -80,7 +80,7 @@ class CartController extends Controller
         }
 
         return response()->json([
-            'message' => 'Likes data found successfully',
+            'message' => 'Cart data found successfully',
             'carts' => $cartsData,
         ], 200);
     }
