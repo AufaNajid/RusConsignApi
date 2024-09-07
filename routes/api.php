@@ -83,7 +83,7 @@ Route::group([
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::post('/cart/remove-selected', [CartController::class, 'destroySelected']);
-    Route::post('/cart/select-item', [CartController::class, 'se']);
+    Route::post('/cart/select-item', [CartController::class, 'selectCartItems']);
     Route::post('/cart/checkout', [CartController::class, 'checkoutSelectedItems']);
 
 
