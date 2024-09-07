@@ -70,11 +70,10 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
     }
-
     public function selectCartItems(Request $request)
     {
-        // Ambil parameter 'cart_ids' dari body permintaan dan decode JSON
-        $cartIds = json_decode($request->get('cart_ids'), true);
+        // Ambil parameter 'cart_ids' dari body permintaan
+        $cartIds = $request->input('cart_ids');
 
         // Validasi input
         if (!is_array($cartIds) || empty($cartIds)) {
@@ -103,6 +102,7 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
 
     public function checkoutSelectedItems(Request $request)
