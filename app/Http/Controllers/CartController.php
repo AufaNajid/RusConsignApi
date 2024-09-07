@@ -88,7 +88,7 @@ class CartController extends Controller
         }
 
         return response()->json([
-            'message' => 'Cart data found successfully',
+            'message' => 'Cart data  successfully',
             'carts' => $cartsData,
         ], 200);
     }
@@ -122,7 +122,6 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
         $request->validate([
             'cart_ids' => 'required|string',
         ]);
