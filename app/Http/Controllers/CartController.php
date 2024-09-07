@@ -40,7 +40,7 @@ class CartController extends Controller
         });
 
         return response()->json([
-            "message" => "Data Cart berhasil ditemukan",
+            "message" => "Data Like berhasil ditemukan",
             "cart" => $cartItems,
         ], 200);
     }
