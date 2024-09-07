@@ -225,27 +225,27 @@ class CartController extends Controller
 
     public function destroySelected(Request $request)
     {
-        // Validasi input - pastikan barang_id adalah string yang dipisahkan oleh koma
+        // Validasi input - pastikan cart_ids adalah string yang dipisahkan oleh koma
         $request->validate([
-            'barang_ids' => 'required|string',
+            'cart_ids' => 'required|string',
         ]);
 
-        // Mengubah string barang_ids menjadi array integer
-        $barangIds = explode(',', $request->input('barang_ids'));
+        // Mengubah string cart_ids menjadi array integer
+        $cartIds = explode(',', $request->input('cart_ids'));
 
         // Ambil data dari cart berdasarkan IDs yang diberikan
         $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('barang_id', $barangIds)
+            ->whereIn('carts_id', $cartIds)
             ->get();
 
         // Jika tidak ada data ditemukan
         if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'No cart items found for the selected barang_ids'], 404);
+            return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
         }
 
-        // Hapus barang dari cart
+        // Hapus barang dari cart berdasarkan carts_id
         Cart::where('user_id', Auth::id())
-            ->whereIn('barang_id', $barangIds)
+            ->whereIn('carts_id', $cartIds)
             ->delete();
 
         // Kirim respons JSON yang benar
