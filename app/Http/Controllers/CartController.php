@@ -87,7 +87,6 @@ class CartController extends Controller
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
-        dd($request->all());
 
         return response()->json([
             'message' => 'Selected cart items found',
