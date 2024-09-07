@@ -44,8 +44,6 @@ class LikeController extends Controller
     }
 
 
-
-
     public function favorite(Request $request)
     {
         $request->validate([

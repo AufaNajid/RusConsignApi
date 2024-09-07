@@ -73,13 +73,16 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
+        // Validasi input
         $validated = $request->validate([
             'cart_ids' => 'required|array',
-            'cart_ids.*' => 'integer|exists:carts,carts_id', // Pastikan nama kolom sesuai dengan database
+            'cart_ids.*' => 'integer|exists:carts,id', // Pastikan nama kolom sesuai dengan database
         ]);
 
+        $cartIds = $validated['cart_ids'];
+
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $validated['cart_ids']) // Gunakan 'carts_id' jika kolom di database
+            ->whereIn('id', $cartIds) // Gunakan 'id' jika kolom di database adalah 'id'
             ->with('barang.mitra')
             ->get();
 
@@ -92,6 +95,7 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
 
 
