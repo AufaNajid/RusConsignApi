@@ -70,24 +70,17 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
     }
+
     public function selectCartItems(Request $request)
     {
-        // Ambil parameter 'cart_ids' dari body permintaan
-        $cartIds = $request->input('cart_ids');
-
         // Validasi input
-        if (!is_array($cartIds) || empty($cartIds)) {
-            return response()->json(['message' => 'Invalid or empty cart_ids'], 400);
-        }
+        $validated = $request->validate([
+            'cart_ids' => 'required|array',
+            'cart_ids.*' => 'integer|exists:carts,id',
+        ]);
 
-        // Validasi setiap item dalam cart_ids
-        foreach ($cartIds as $cartId) {
-            if (!is_integer($cartId)) {
-                return response()->json(['message' => 'Invalid cart_id format'], 400);
-            }
-        }
+        $cartIds = $validated['cart_ids'];
 
-        // Ambil item keranjang berdasarkan cart_ids
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('id', $cartIds)
             ->with('barang.mitra')
@@ -102,6 +95,7 @@ class CartController extends Controller
             'selected_cart_items' => $selectedCartItems,
         ], 200);
     }
+
 
 
 
