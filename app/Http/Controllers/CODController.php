@@ -21,6 +21,7 @@ class CODController extends Controller
         ], 200);
     }
 
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -39,7 +40,6 @@ class CODController extends Controller
 
         $totalAmount = $barang->harga * $validatedData['quantity'];
 
-        // Update the stock
         $barang->stock_barang -= $validatedData['quantity'];
         $barang->save();
 

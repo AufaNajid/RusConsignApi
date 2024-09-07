@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\Cart;
+use App\Models\Cod;
 use App\Models\Komentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,68 @@ class CartController extends Controller
         return response()->json(['message' => 'Product added to cart', 'cartItem' => $cartItem], 201);
     }
 
+    public function selectCartItems(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_id' => 'required|array',
+            'cart_id.*' => 'integer|exists:carts,id',
+        ]);
+
+        $selectedCartItems = Cart::where('user_id', Auth::id())
+            ->whereIn('id', $validated['cart_ids'])
+            ->with('barang.mitra')
+            ->get();
+
+        if ($selectedCartItems->isEmpty()) {
+            return response()->json(['message' => 'No selected cart items found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Selected cart items found',
+            'selected_cart_items' => $selectedCartItems,
+        ], 200);
+    }
+
+    public function checkoutSelectedItems(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_ids' => 'required|array',
+            'cart_ids.*' => 'integer|exists:carts,id',
+        ]);
+
+        $selectedCartItems = Cart::where('user_id', Auth::id())
+            ->whereIn('id', $validated['cart_ids'])
+            ->with('barang.mitra')
+            ->get();
+
+        if ($selectedCartItems->isEmpty()) {
+            return response()->json(['message' => 'No selected cart items found'], 404);
+        }
+
+        foreach ($selectedCartItems as $cartItem) {
+            $barang = $cartItem->barang;
+
+            if ($barang->stock_barang < $cartItem->quantity) {
+                return response()->json(['message' => 'Insufficient stock for item: ' . $barang->nama_barang], 400);
+            }
+
+            // Kurangi stok barang
+            $barang->stock_barang -= $cartItem->quantity;
+            $barang->save();
+
+            // Simpan data checkout (misalnya dalam tabel baru atau dalam bentuk order)
+            // Di sini hanya ditampilkan pesan success
+        }
+
+        // Hapus barang dari cart setelah checkout
+        Cart::whereIn('id', $validated['cart_ids'])
+            ->where('user_id', Auth::id())
+            ->delete();
+
+        return response()->json(['message' => 'Checkout successful'], 200);
+    }
+
+
     public function destroy(Request $request)
     {
         $validated = $request->validate([
@@ -91,6 +154,26 @@ class CartController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Cart items removed'], 200);
+    }
+
+    public function destroySelected(Request $request)
+    {
+        $validated = $request->validate([
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'integer|exists:carts,barang_id',
+        ]);
+
+        $user_id = Auth::id();
+
+        $deleted = Cart::where('user_id', $user_id)
+            ->whereIn('barang_id', $validated['barang_id'])
+            ->delete();
+
+        if ($deleted === 0) {
+            return response()->json(['message' => 'No cart items found for the selected barang_id'], 404);
+        }
+
+        return response()->json(['message' => 'Selected cart items removed'], 200);
     }
 
 }
