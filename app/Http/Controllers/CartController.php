@@ -79,13 +79,15 @@ class CartController extends Controller
         ]);
 
         $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $validated['cart_id']) // Menggunakan 'cart_id'
+            ->whereIn('id', $validated['cart_id'])
             ->with('barang.mitra')
             ->get();
 
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
+
+        dd($request->all());
 
         return response()->json([
             'message' => 'Selected cart items found',
