@@ -126,21 +126,17 @@ class CartController extends Controller
             'cart_ids' => 'required|string',
         ]);
 
-        // Mengubah string cart_ids menjadi array integer
         $cartIds = explode(',', $request->input('cart_ids'));
 
-        // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
-        // Jika tidak ada data ditemukan
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
-        // Kirim data yang ditemukan sebagai respons JSON
         return response()->json([
             'message' => 'Selected cart items found',
             'selected_cart_items' => $selectedCartItems,
@@ -227,17 +223,18 @@ class CartController extends Controller
 
     public function destroySelected(Request $request)
     {
-
+        // Validasi input, pastikan cart_ids adalah array dari integer
         $request->validate([
-            'cart_id' => 'required|integer|exists:carts,id',
+            'cart_ids' => 'required|array',
+            'cart_ids.*' => 'integer|exists:carts,id',
         ]);
 
-        // Mengubah string cart_ids menjadi array integer
-        $cartIds = explode(',', $request->input('cart_ids'));
+        // Ambil cart_ids dari input request
+        $cartIds = $request->input('cart_ids');
 
         // Ambil data dari cart berdasarkan IDs yang diberikan
         $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds)
+            ->whereIn('id', $cartIds) // Ganti 'carts_id' dengan 'id'
             ->get();
 
         // Jika tidak ada data ditemukan
@@ -245,9 +242,9 @@ class CartController extends Controller
             return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
         }
 
-        // Hapus barang dari cart berdasarkan carts_id
+        // Hapus barang dari cart berdasarkan cart_ids
         Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds)
+            ->whereIn('carts_id', $cartIds) // Ganti 'carts_id' dengan 'id'
             ->delete();
 
         // Kirim respons JSON yang benar
@@ -256,5 +253,6 @@ class CartController extends Controller
             'deleted_items' => $cartItems // Menyertakan item yang dihapus dalam respons
         ], 200);
     }
+
 
 }
