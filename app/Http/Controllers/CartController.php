@@ -22,7 +22,14 @@ class CartController extends Controller
         }
 
         $carts = Cart::where('user_id', $user->id)
-            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'barang.mitra.profileImage')
+            ->with([
+                'barang' => function ($query) {
+                    $query->where('stock_barang', '>', 0); // Menambahkan kondisi untuk stock
+                },
+                'barang.category:id,name',
+                'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',
+                'barang.mitra.profileImage'
+            ])
             ->get();
 
         if ($carts->isEmpty()) {
@@ -55,7 +62,7 @@ class CartController extends Controller
             $totalPrice = $barang->harga * $cart->quantity;
 
             $cartsData[] = [
-                'cart_id' => $cart->carts_id,
+                'cart_id' => $cart->id, // Mengganti `carts_id` dengan `id`
                 'quantity' => $cart->quantity,
                 'total_price' => $totalPrice, // Tambahkan total harga di sini
                 'barang' => [
@@ -88,10 +95,11 @@ class CartController extends Controller
         }
 
         return response()->json([
-            'message' => 'Cart data  successfully',
+            'message' => 'Cart data retrieved successfully',
             'carts' => $cartsData,
         ], 200);
     }
+
 
 
     public function store(Request $request)
@@ -128,15 +136,18 @@ class CartController extends Controller
 
         $cartIds = explode(',', $request->input('cart_ids'));
 
+        // Ambil data dari cart berdasarkan IDs yang diberikan
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('carts_id', $cartIds)
             ->with('barang.mitra')
             ->get();
 
+        // Jika tidak ada data ditemukan
         if ($selectedCartItems->isEmpty()) {
             return response()->json(['message' => 'No selected cart items found'], 404);
         }
 
+        // Kirim data yang ditemukan sebagai respons JSON
         return response()->json([
             'message' => 'Selected cart items found',
             'selected_cart_items' => $selectedCartItems,
@@ -221,38 +232,34 @@ class CartController extends Controller
     }
 
 
-    public function destroySelected(Request $request)
-    {
-        // Validasi input, pastikan cart_ids adalah array dari integer
-        $request->validate([
-            'cart_ids' => 'required|array',
-            'cart_ids.*' => 'integer|exists:carts,id',
-        ]);
+        public function destroySelected(Request $request)
+        {
 
-        // Ambil cart_ids dari input request
-        $cartIds = $request->input('cart_ids');
+            $request->validate([
+                'cart_id' => 'required|integer|exists:carts,id',
+            ]);
 
-        // Ambil data dari cart berdasarkan IDs yang diberikan
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $cartIds) // Ganti 'carts_id' dengan 'id'
-            ->get();
+            $cartIds = explode(',', $request->input('cart_ids'));
 
-        // Jika tidak ada data ditemukan
-        if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
+            $cartItems = Cart::where('user_id', Auth::id())
+                ->whereIn('carts_id', $cartIds)
+                ->get();
+
+            // Jika tidak ada data ditemukan
+            if ($cartItems->isEmpty()) {
+                return response()->json(['message' => 'No cart items found for the selected cart_ids'], 404);
+            }
+
+            // Hapus barang dari cart berdasarkan carts_id
+            Cart::where('user_id', Auth::id())
+                ->whereIn('carts_id', $cartIds)
+                ->delete();
+
+            // Kirim respons JSON yang benar
+            return response()->json([
+                'message' => 'Selected cart items removed',
+                'deleted_items' => $cartItems // Menyertakan item yang dihapus dalam respons
+            ], 200);
         }
-
-        // Hapus barang dari cart berdasarkan cart_ids
-        Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds) // Ganti 'carts_id' dengan 'id'
-            ->delete();
-
-        // Kirim respons JSON yang benar
-        return response()->json([
-            'message' => 'Selected cart items removed',
-            'deleted_items' => $cartItems // Menyertakan item yang dihapus dalam respons
-        ], 200);
-    }
-
 
 }

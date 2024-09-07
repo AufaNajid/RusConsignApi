@@ -136,6 +136,7 @@ class BarangController extends Controller
         $categoryId = $request->query('category_id');
 
         $query = Barang::where('status_post', 'publish')
+            ->where('stock_barang', '>', 0)
             ->with('category:id,name', 'mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage');
 
         if ($categoryId) {

@@ -18,7 +18,14 @@ class LikeController extends Controller
         }
 
         $likes = Like::where('user_id', $user->id)
-            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage')
+            ->with([
+                'barang' => function ($query) {
+                    $query->where('stock_barang', '>', 0); // Menambahkan kondisi untuk stock
+                },
+                'barang.category:id,name',
+                'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',
+                'barang.mitra.profileImage'
+            ])
             ->get();
 
         if ($likes->isEmpty()) {
@@ -47,7 +54,7 @@ class LikeController extends Controller
                 }, 0) / ($total ?: 1);
 
             $likeData[] = [
-                'id' => $like->likeid,
+                'id' => $like->id, // Mengganti `likeid` dengan `id`
                 'created_at' => $like->created_at,
                 'updated_at' => $like->updated_at,
                 'barang' => [
@@ -82,6 +89,7 @@ class LikeController extends Controller
             'likes' => $likeData,
         ], 200);
     }
+
 
 
 
