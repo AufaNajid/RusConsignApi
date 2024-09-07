@@ -73,8 +73,8 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        // Ambil parameter 'cart_ids' dari body permintaan
-        $cartIds = $request->input('cart_ids');
+        // Ambil parameter 'cart_ids' dari body permintaan dan decode JSON
+        $cartIds = json_decode($request->get('cart_ids'), true);
 
         // Validasi input
         if (!is_array($cartIds) || empty($cartIds)) {
@@ -108,7 +108,8 @@ class CartController extends Controller
 
 
 
-public function checkoutSelectedItems(Request $request)
+
+    public function checkoutSelectedItems(Request $request)
     {
         $validated = $request->validate([
             'cart_ids' => 'required|array',
