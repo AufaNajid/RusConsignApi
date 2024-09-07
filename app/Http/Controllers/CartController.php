@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\Cart;
 use App\Models\Cod;
 use App\Models\Komentar;
+use App\Models\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,26 @@ class CartController extends Controller
 
     public function index()
     {
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->whereHas('barang')
-            ->with(['barang.mitra'])
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $carts = Cart::where('user_id', $user->id)
+            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage')
             ->get();
 
-        $cartItems->map(function ($cartItem) {
-            $barang = $cartItem->barang;
+        if ($carts->isEmpty()) {
+            return response()->json(['message' => 'No likes found'], 404);
+        }
+
+        $cartsData = [];
+        foreach ($carts as $cart) {
+            $barang = $cart->barang;
+
+            if (!$barang) {
+                continue;
+            }
 
             $rate = Komentar::select(
                 DB::raw('count(1) as total'),
@@ -36,12 +50,40 @@ class CartController extends Controller
                     return $carry + ($item->total * $item->rate);
                 }, 0) / ($total ?: 1);
 
-            $cartItem->barang->rating_barang = $avg;
-        });
+            $cartsData[] = [
+                'id' => $cart->likeid,
+                'created_at' => $cart->created_at,
+                'updated_at' => $cart->updated_at,
+                'barang' => [
+                    'id' => $barang->id,
+                    'nama_barang' => $barang->nama_barang,
+                    'deskripsi' => $barang->deskripsi,
+                    'harga' => $barang->harga,
+                    'rating_barang' => $avg,
+                    'category_id' => $barang->category->id,
+                    'category_nama' => $barang->category->name,
+                    'image_barang' => $barang->image_barang,
+                    'status' => $barang->status_post,
+                    'created_at' => $barang->created_at,
+                    'updated_at' => $barang->updated_at,
+                    'mitra' => [
+                        'id' => $barang->mitra->id,
+                        'nama_toko' => $barang->mitra->nama_toko,
+                        'nama_lengkap' => $barang->mitra->nama_lengkap,
+                        'jumlah_product' => $barang->mitra->jumlah_product,
+                        'jumlah_jasa' => $barang->mitra->jumlah_jasa,
+                        'pengikut' => $barang->mitra->pengikut,
+                        'penilaian' => $barang->mitra->penilaian,
+                        'no_whatsapp' => $barang->mitra->no_whatsapp,
+                        'profile_image' => $barang->mitra->profileImage->image_profile ?? null
+                    ],
+                ],
+            ];
+        }
 
         return response()->json([
-            "message" => "Data Cart berhasil ditemukan",
-            "cart" => $cartItems,
+            'message' => 'Likes data found successfully',
+            'likes' => $cartsData,
         ], 200);
     }
 
