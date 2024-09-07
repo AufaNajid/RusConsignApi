@@ -18,7 +18,7 @@ class LikeController extends Controller
         }
 
         $likes = Like::where('user_id', $user->id)
-            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian')
+            ->with('barang.category:id,name', 'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp, mitra.profileImage')
             ->get();
 
         if ($likes->isEmpty()) {
@@ -70,6 +70,8 @@ class LikeController extends Controller
                         'jumlah_jasa' => $barang->mitra->jumlah_jasa,
                         'pengikut' => $barang->mitra->pengikut,
                         'penilaian' => $barang->mitra->penilaian,
+                        'no_whatsapp'=> $barang->mitra->no_whatsapp,
+                        'profile_image' => $barang->mitra->profileImage->image_profile ?? null
                     ],
                 ],
             ];
