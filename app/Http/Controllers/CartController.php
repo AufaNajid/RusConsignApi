@@ -73,18 +73,15 @@ class CartController extends Controller
 
     public function selectCartItems(Request $request)
     {
-        // Mengubah input 'carts_id' menjadi array jika dikirim dalam format JSON string
         $request->merge([
             'carts_id' => is_string($request->input('carts_id')) ? json_decode($request->input('carts_id'), true) : $request->input('carts_id'),
         ]);
 
-        // Validasi
         $validated = $request->validate([
             'carts_id' => 'required|array',
             'carts_id.*' => 'integer|exists:carts,id',
         ]);
 
-        // Ambil item yang dipilih dari cart
         $selectedCartItems = Cart::where('user_id', Auth::id())
             ->whereIn('id', $validated['carts_id'])
             ->with('barang.mitra')
