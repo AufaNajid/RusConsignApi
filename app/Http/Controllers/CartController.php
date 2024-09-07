@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\Cart;
 use App\Models\Cod;
 use App\Models\Komentar;
+use App\Models\Like;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -202,25 +203,24 @@ class CartController extends Controller
 
     public function destroy($id, Request $request)
     {
-        // Validasi ID yang diterima adalah integer dan ada di tabel carts
-        $validated = $request->validate([
-            'cart_id' => 'integer|exists:carts,id',
-        ]);
-
-        // Ambil ID dari parameter route
-        $cartId = $id;
+        // Periksa apakah user sudah terautentikasi
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
 
         // Cari item cart berdasarkan ID dan user yang sedang login
-        $cartItem = Cart::where('id', $cartId)
-            ->where('user_id', Auth::id())
+        $cart = Cart::where('user_id', $user->id)
+            ->where('id', $id)
             ->first();
 
-        if (!$cartItem) {
+        // Jika item cart tidak ditemukan
+        if (!$cart) {
             return response()->json(['message' => 'Cart item not found'], 404);
         }
 
         // Hapus item cart
-        $cartItem->delete();
+        $cart->delete();
 
         return response()->json(['message' => 'Cart item removed'], 200);
     }
