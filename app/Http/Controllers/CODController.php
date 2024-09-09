@@ -85,7 +85,7 @@ class CODController extends Controller
 
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $quantity = $validatedData['quantity'][$index] ?? 1;
-            $lokasiId = $validatedData['lokasi_id'][$index] ?? null;
+            $lokasiId = $validatedData['lokasi_id'];
 
             $barang = Barang::findOrFail($barangId);
             $lokasi = Lokasi::findOrFail($lokasiId);
