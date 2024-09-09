@@ -198,7 +198,7 @@ class CartController extends Controller
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
-                'rating_barang' => $avgRating,
+//                'rating_barang' => $avgRating,
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
