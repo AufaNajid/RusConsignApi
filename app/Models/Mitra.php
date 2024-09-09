@@ -30,7 +30,7 @@ class Mitra extends Model
     ];
     public function profileImage()
     {
-        return $this->hasOne(ProfileImage::class, 'mitra_id', 'id');
+        return $this->hasOne(ProfileImage::class, 'mitra_id', 'id'); // Pastikan relasi sesuai
     }
 
     public function lokasis()
