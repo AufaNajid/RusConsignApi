@@ -24,7 +24,7 @@ class CartController extends Controller
         $carts = Cart::where('user_id', $user->id)
             ->with([
                 'barang' => function ($query) {
-                    $query->where('stock_barang', '>', 0); // Menambahkan kondisi untuk stock
+                    $query->where('stock_barang', '>', 0);
                 },
                 'barang.category:id,name',
                 'barang.mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',
@@ -192,7 +192,7 @@ class CartController extends Controller
             $checkedOutItems[] = $checkedOutItems->load('barang.mitra');
         }
 
-        return response()->json(['message' => 'Products added to cart', 'cartItems' => $cartItems], 201);
+        return response()->json(['message' => 'Products added to cart', 'checkedOutItems' => $checkedOutItems], 201);
     }
 
 
