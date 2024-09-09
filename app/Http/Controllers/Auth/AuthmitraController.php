@@ -35,7 +35,7 @@ class AuthmitraController extends Controller
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
-        $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : null;
+        $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : '';
 
         // Format data mitra
         $mitraData = [
