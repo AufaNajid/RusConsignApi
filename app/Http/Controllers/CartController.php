@@ -193,12 +193,25 @@ class CartController extends Controller
                 ]
             );
 
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barangId)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avgRating = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
             $checkedOutItems[] = [
                 'id' => $barang->id,
                 'nama_barang' => $barang->nama_barang,
                 'deskripsi' => $barang->deskripsi,
                 'harga' => $barang->harga,
-//                'rating_barang' => $avgRating,
+                'rating_barang' => $avgRating,
                 'category_id' => $barang->category->id,
                 'category_nama' => $barang->category->name,
                 'image_barang' => $barang->image_barang,
