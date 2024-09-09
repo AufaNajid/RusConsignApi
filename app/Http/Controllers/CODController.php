@@ -77,7 +77,7 @@ class CODController extends Controller
             'barang_id.*' => 'exists:barangs,id',
             'quantity' => 'required|array',
             'quantity.*' => 'integer|min:1',
-            'lokasi_id' => 'required|exists:lokasis,id',
+            'lokasi_id' => 'required|exists:lokasis',
         ]);
 
         $user = Auth::user();
