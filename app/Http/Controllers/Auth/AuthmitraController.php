@@ -29,19 +29,18 @@ class AuthmitraController extends Controller
 
     public function show($id)
     {
-        // Cari barang berdasarkan ID
-        $barang = Barang::with('mitra.profileImage')->find($id);
+        // Cari mitra berdasarkan ID
+        $mitra = Mitra::with('profileImage')->find($id);
 
-        // Periksa apakah barang ditemukan
-        if (!$barang) {
-            return response()->json(['message' => 'Barang not found'], 404);
+        // Periksa apakah mitra ditemukan
+        if (!$mitra) {
+            return response()->json(['message' => 'Mitra not found'], 404);
         }
 
-        $mitra = $barang->mitra;
+        // Cek apakah profileImage ada dan ambil image_profile atau set null
+        $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : null;
 
-        // Jika profileImage tidak ada, set default value
-        $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : 'default_image_path.jpg';
-
+        // Format data mitra
         $mitraData = [
             'id' => $mitra->id,
             'nama_toko' => $mitra->nama_toko,
@@ -54,6 +53,7 @@ class AuthmitraController extends Controller
             'profile_image' => $profileImage,
         ];
 
+        // Kembalikan respons JSON
         return response()->json([
             'message' => 'Mitra data retrieved successfully',
             'mitra' => $mitraData,
