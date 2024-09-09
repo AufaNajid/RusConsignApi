@@ -27,7 +27,7 @@ class CartController extends Controller
                     $query->where('stock_barang', '>', 0); // Menambahkan kondisi untuk stock
                 },
                 'barang.category:id,name',
-                'barang.mitra:id,nama_lengkap,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',
+                'barang.mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp',
                 'barang.mitra.profileImage'
             ])
             ->get();
@@ -80,7 +80,7 @@ class CartController extends Controller
                     'updated_at' => $barang->updated_at,
                     'mitra' => [
                         'id' => $barang->mitra->id,
-                        'nama_toko' => $barang->mitra->name_toko,
+                        'nama_toko' => $barang->mitra->nama_toko,
                         'nama_lengkap' => $barang->mitra->nama_lengkap,
                         'jumlah_product' => $barang->mitra->jumlah_product,
                         'jumlah_jasa' => $barang->mitra->jumlah_jasa,
