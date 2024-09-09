@@ -84,10 +84,10 @@ class CODController extends Controller
 
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $quantity = $validatedData['quantity'][$index] ?? 1;
-            $lokasiId = $validatedData['lokasi_id'];
+//            $lokasi = ($validatedData['lokasi_id']);
 
             $barang = Barang::findOrFail($barangId);
-            $lokasi = Lokasi::findOrFail($lokasiId);
+            $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
 
             if ($barang->stock_barang < $quantity) {
                 return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
@@ -101,7 +101,7 @@ class CODController extends Controller
             // Membuat entri COD baru
             $cod = Cod::create([
                 'barang_id' => $barangId,
-                'lokasi_id' => $validatedData['lokasi_id'],
+                'lokasi_id' => $lokasi,
                 'quantity' => $quantity,
                 'status_pembayaran' => 'belum_pembayaran',
                 'grand_total' => $totalAmount,
