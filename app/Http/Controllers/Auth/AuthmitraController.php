@@ -29,33 +29,13 @@ class AuthmitraController extends Controller
 
     public function show($id)
     {
-        $mitra = Mitra::with('profileImage')->find($id);
-
+        $mitra = Mitra::find($id);
         if (!$mitra) {
             return response()->json(['message' => 'Mitra not found'], 404);
         }
 
-        $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : '';
-
-        $mitraData = [
-            'id' => $mitra->id,
-            'nama_toko' => $mitra->nama_toko,
-            'nama_lengkap' => $mitra->nama_lengkap,
-            'jumlah_product' => $mitra->jumlah_product,
-            'jumlah_jasa' => $mitra->jumlah_jasa,
-            'pengikut' => $mitra->pengikut,
-            'penilaian' => $mitra->penilaian,
-            'no_whatsapp' => $mitra->no_whatsapp,
-            'profile_image' => $profileImage,
-        ];
-
-        return response()->json([
-            'message' => 'Mitra data retrieved successfully',
-            'mitra' => $mitraData,
-        ], 200);
+        return new MitraResource($mitra);
     }
-
-
     public function registermitra(Request $request)
     {
         $validator = Validator::make($request->all(), [
