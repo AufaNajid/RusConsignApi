@@ -181,7 +181,6 @@ class CartController extends Controller
 
             $totalPrice = $barang->harga * $quantity;
 
-            // Simpan item checkout ke dalam cart atau update jika sudah ada
             $cartItem = Cart::updateOrCreate(
                 [
                     'user_id' => $userId,

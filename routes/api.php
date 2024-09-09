@@ -69,6 +69,7 @@ Route::group([
     Route::get('/test',[ProductController::class,'test']);
 
     Route::post('add-pembayaran-cod', [\App\Http\Controllers\CODController::class, 'store']);
+    Route::post('/checkout', [\App\Http\Controllers\CODController::class, 'store']);
     Route::put('/cod/{id}/update-status',[\App\Http\Controllers\CODController::class, 'updateStatus']);
     Route::get('/user/{user_id}/cods', [\App\Http\Controllers\CODController::class, 'getUserCods']);
     Route::get('/mitra/{mitra_id}/cods', [\App\Http\Controllers\CODController::class, 'getMitraCods']);

@@ -62,6 +62,66 @@ class CODController extends Controller
         ], 201);
     }
 
+
+    public function multiplebarang(Request $request)
+    {
+        $request->merge([
+            'barang_id' => json_decode($request->input('barang_id')),
+            'quantity' => json_decode($request->input('quantity')),
+            'lokasi_id' => json_decode($request->input('lokasi_id')),
+        ]);
+
+        // Validasi input
+        $request->validate([
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'exists:barangs,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'integer|min:1',
+            'lokasi_id' => 'required|array',
+            'lokasi_id.*' => 'required|exists:lokasis,id',
+        ]);
+
+        $user = Auth::user();
+        $cods = [];
+
+        foreach ($request->barang_id as $index => $barangId) {
+            $quantity = $request->quantity[$index] ?? 1;
+            $lokasiId = $request->lokasi_id[$index] ?? null;
+
+            $barang = Barang::findOrFail($barangId);
+            $lokasi = Lokasi::findOrFail($lokasiId);
+
+            if ($barang->stock_barang < $quantity) {
+                return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
+            }
+
+            $totalAmount = $barang->harga * $quantity;
+
+            // Mengurangi stok barang
+            $barang->stock_barang -= $quantity;
+            $barang->save();
+
+            // Membuat entri COD baru
+            $cod = Cod::create([
+                'barang_id' => $barangId,
+                'lokasi_id' => $lokasiId,
+                'quantity' => $quantity,
+                'status_pembayaran' => 'belum_pembayaran',
+                'grand_total' => $totalAmount,
+                'user_id' => $user->id,
+                'mitra_id' => $barang->mitra->id,
+            ]);
+
+            $cods[] = $cod;
+        }
+
+        return response()->json([
+            'message' => 'Pembayaran berhasil ditambahkan',
+            'cods' => $cods,
+            'user' => $user
+        ], 201);
+    }
+
     public function updateStatus(Request $request, $id)
         {
             $validatedData = $request->validate([
