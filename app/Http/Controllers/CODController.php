@@ -86,10 +86,9 @@ class CODController extends Controller
 
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $quantity = $validatedData['quantity'][$index] ?? 1;
-            $lokasiId = $validatedData['lokasi_id'][$index] ?? null;
 
             $barang = Barang::findOrFail($barangId);
-            $lokasi = Lokasi::findOrFail($lokasiId);
+            $lokasi = Lokasi::findOrFail();
 
             if ($barang->stock_barang < $quantity) {
                 return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
@@ -97,7 +96,6 @@ class CODController extends Controller
 
             $totalAmount = $barang->harga * $quantity;
 
-            // Mengurangi stok barang
             $barang->stock_barang -= $quantity;
             $barang->save();
 
