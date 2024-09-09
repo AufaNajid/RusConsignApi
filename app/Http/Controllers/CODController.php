@@ -76,7 +76,7 @@ class CODController extends Controller
             'barang_id.*' => 'exists:barangs,id',
             'quantity' => 'required|array',
             'quantity.*' => 'integer|min:1',
-            'lokasi_id' => 'required|exists:lokasis',
+            'lokasi_id' => 'required|exists:lokasis,id',
         ]);
 
         $user = Auth::user();
@@ -84,7 +84,6 @@ class CODController extends Controller
 
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $quantity = $validatedData['quantity'][$index] ?? 1;
-//            $lokasi = ($validatedData['lokasi_id']);
 
             $barang = Barang::findOrFail($barangId);
             $lokasi = Lokasi::findOrFail($validatedData['lokasi_id']);
