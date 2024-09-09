@@ -16,7 +16,7 @@ class MitraResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image profile'=>$this->user->image_profile,
+//            'image profile'=>$this->user->image_profile,
             'nama' => $this->nama_lengkap,
             'nama toko'=> $this->nama_toko,
             'bio_deskripsi' => $this->user->bio_desc ?? "",
