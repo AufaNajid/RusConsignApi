@@ -77,23 +77,17 @@ Route::group([
     Route::delete('/cod/cancel/{id}', [\App\Http\Controllers\CODController::class, 'cancelOrder']);
     Route::get('/cods/status/{status}', [\App\Http\Controllers\CODController::class, 'getAllByStatus']);
 
-
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'store']);
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
-    Route::delete('/cart/destroy-selected', [CartController::class, 'destroySelected']);
     Route::post('/cart/select-item', [CartController::class, 'selectCartItems']);
     Route::post('/cart/checkout', [CartController::class, 'checkoutSelectedItems']);
-
-
-
 
     Route::get('allprofile', [ProfileController::class, 'allprofile']);
     Route::get('mitra/{id}', [ProfileController::class, 'allprofilebymitra']);
     Route::post('edit-profile', [ProfileController::class, 'editProfile']);
 
-    // Like routes
     Route::get('likes', [LikeController::class, 'index']);
     Route::post('likes', [LikeController::class, 'favorite']);
     Route::delete('likes/{barang_id}', [LikeController::class, 'unfavorite']);

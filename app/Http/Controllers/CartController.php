@@ -154,50 +154,53 @@ class CartController extends Controller
     public function checkoutSelectedItems(Request $request)
     {
         $request->validate([
-            'cart_ids' => 'required|string',
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'required|integer|exists:barangs,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'required|integer|min:1',
         ]);
 
-        $cartIds = explode(',', $request->input('cart_ids'));
+        $barangIds = $request->input('barang_id');
+        $quantities = $request->input('quantity');
+        $checkedOutItems = [];
 
-        $selectedCartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('carts_id', $cartIds)
-            ->with('barang.mitra')
-            ->get();
+        foreach ($barangIds as $index => $barangId) {
+            $barang = Barang::find($barangId);
 
-            if ($selectedCartItems->isEmpty()) {
-            return response()->json(['message' => 'No selected cart items found'], 404);
-        }
+            if (!$barang) {
+                return response()->json(['message' => 'Barang not found for ID: ' . $barangId], 404);
+            }
 
+            $quantity = $quantities[$index];
 
-        // Proses checkout
-        foreach ($selectedCartItems as $cartItem) {
-            $barang = $cartItem->barang;
-
-            // Periksa apakah stok cukup
-            if ($barang->stock_barang < $cartItem->quantity) {
+            if ($barang->stock_barang < $quantity) {
                 return response()->json(['message' => 'Insufficient stock for item: ' . $barang->nama_barang], 400);
             }
 
-            // Kurangi stok barang
-            $barang->stock_barang -= $cartItem->quantity;
+            $barang->stock_barang -= $quantity;
             $barang->save();
 
-
-            // Hapus barang dari cart setelah checkout
-            Cart::whereIn('carts_id', $cartIds)
+            Cart::where('barang_id', $barangId)
                 ->where('user_id', Auth::id())
                 ->delete();
 
-            // Kirim respons JSON yang benar
-            return response()->json([
-                'message' => 'Checkout successful',
-                'checked_out_items' => $selectedCartItems
-            ], 200);
+            $checkedOutItems[] = [
+                'barang_id' => $barangId,
+                'nama_barang' => $barang->nama_barang,
+                'quantity' => $quantity,
+                'mitra' => $barang->mitra
+            ];
         }
+
+        if (empty($checkedOutItems)) {
+            return response()->json(['message' => 'No items checked out'], 400);
+        }
+
+        return response()->json([
+            'message' => 'Checkout successful',
+            'checked_out_items' => $checkedOutItems
+        ], 200);
     }
-
-
-
 
     public function destroy($id, Request $request)
     {
@@ -215,48 +218,29 @@ class CartController extends Controller
         }
 
         $cart->delete();
-
         return response()->json(['message' => 'Cart item removed'], 200);
     }
 
-
-    public function destroySelected(Request $request)
+    public function destroyMultiple(Request $request)
     {
-        $request->validate([
-            'cart_ids' => 'required|string', // Expecting a comma-separated string of cart IDs
-        ]);
-
-        $cartIds = explode(',', $request->input('cart_ids'));
-
         $user = Auth::user();
         if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        // Fetch the cart items to be deleted
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->whereIn('id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
-            ->get();
+        $request->validate([
+            'cart_ids' => 'required|array|min:1',
+            'cart_ids.*' => 'required|integer|exists:carts,carts_id',
+        ]);
 
-        if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'Cart item not found'], 404);
-        }
+        $cartIds = $request->input('cart_ids');
 
-        // Delete the selected cart items
-        $deleted = Cart::where('user_id', $user->id)
-            ->whereIn('carts_id', $cartIds)  // Menggunakan 'id' untuk menyesuaikan dengan perubahan sebelumnya
+
+        Cart::where('user_id', $user->id)
+            ->whereIn('carts_id', $cartIds)
             ->delete();
 
-        if ($deleted === 0) {
-            return response()->json(['message' => 'Cart item not found'], 404);
-        }
-
-        return response()->json([
-            'message' => 'Selected cart items removed',
-            'deleted_items' => $cartItems
-        ], 200);
+        return response()->json(['message' => 'Selected cart items removed'], 200);
     }
-
-
 
 }
