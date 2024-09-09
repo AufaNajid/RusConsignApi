@@ -69,7 +69,6 @@ class CODController extends Controller
         $request->merge([
             'barang_id' => json_decode($request->input('barang_id')),
             'quantity' => json_decode($request->input('quantity')),
-            'lokasi_id' => json_decode($request->input('lokasi_id')),
         ]);
 
         // Validasi input
@@ -86,9 +85,10 @@ class CODController extends Controller
 
         foreach ($validatedData['barang_id'] as $index => $barangId) {
             $quantity = $validatedData['quantity'][$index] ?? 1;
+            $lokasiId = $validatedData['lokasi_id'][$index] ?? null;
 
             $barang = Barang::findOrFail($barangId);
-            $lokasi = Lokasi::findOrFail();
+            $lokasi = Lokasi::findOrFail($lokasiId);
 
             if ($barang->stock_barang < $quantity) {
                 return response()->json(['message' => 'Stok barang tidak mencukupi'], 400);
