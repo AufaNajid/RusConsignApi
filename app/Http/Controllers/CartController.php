@@ -153,11 +153,13 @@ class CartController extends Controller
 
     public function checkoutSelectedItems(Request $request)
     {
+        // Mengubah input JSON menjadi array
         $request->merge([
             'barang_id' => json_decode($request->input('barang_id')),
             'quantity' => json_decode($request->input('quantity')),
         ]);
 
+        // Validasi input
         $request->validate([
             'barang_id' => 'required|array',
             'barang_id.*' => 'exists:barangs,id',
@@ -178,7 +180,8 @@ class CartController extends Controller
 
             $totalPrice = $barang->harga * $quantity;
 
-            $checkedOutItems = Cart::updateOrCreate(
+            // Simpan item checkout ke dalam cart atau update jika sudah ada
+            $cartItem = Cart::updateOrCreate(
                 [
                     'user_id' => $userId,
                     'barang_id' => $barangId,
@@ -189,11 +192,12 @@ class CartController extends Controller
                 ]
             );
 
-            $checkedOutItems[] = $checkedOutItems->load('barang.mitra');
+            $checkedOutItems[] = $cartItem->load('barang.mitra');
         }
 
         return response()->json(['message' => 'Products added to cart', 'checkedOutItems' => $checkedOutItems], 201);
     }
+
 
 
 
