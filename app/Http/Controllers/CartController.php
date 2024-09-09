@@ -154,14 +154,19 @@ class CartController extends Controller
     public function checkoutSelectedItems(Request $request)
     {
         $request->validate([
-            'barang_id' => 'required|array',
-            'barang_id.*' => 'required|integer|exists:barangs,id',
-            'quantity' => 'required|array',
-            'quantity.*' => 'required|integer|min:1',
+            'barang_id' => 'required|string',
+            'quantity' => 'required|string',
         ]);
 
-        $barangIds = $request->input('barang_id');
-        $quantities = $request->input('quantity');
+        // Mengubah string "27,28" menjadi array [27, 28]
+        $barangIds = explode(',', $request->query('barang_id'));
+        $quantities = explode(',', $request->query('quantity'));
+
+        // Validasi panjang array barang_id dan quantity harus sama
+        if (count($barangIds) !== count($quantities)) {
+            return response()->json(['message' => 'Mismatched barang_id and quantity count'], 400);
+        }
+
         $checkedOutItems = [];
 
         foreach ($barangIds as $index => $barangId) {
@@ -201,6 +206,7 @@ class CartController extends Controller
             'checked_out_items' => $checkedOutItems
         ], 200);
     }
+
 
 
     public function destroy($id, Request $request)
