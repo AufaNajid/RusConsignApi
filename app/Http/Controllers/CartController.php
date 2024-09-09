@@ -202,6 +202,7 @@ class CartController extends Controller
         ], 200);
     }
 
+
     public function destroy($id, Request $request)
     {
         $user = Auth::user();
