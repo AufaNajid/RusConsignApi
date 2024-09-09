@@ -151,81 +151,82 @@ class CartController extends Controller
     }
 
 
-        public function checkoutSelectedItems(Request $request)
-        {
-            // Mengubah input JSON menjadi array
-            $request->merge([
-                'barang_id' => json_decode($request->input('barang_id')),
-                'quantity' => json_decode($request->input('quantity')),
-            ]);
+    public function checkoutSelectedItems(Request $request)
+    {
+        // Mengubah input JSON menjadi array
+        $request->merge([
+            'barang_id' => json_decode($request->input('barang_id')),
+            'quantity' => json_decode($request->input('quantity')),
+        ]);
 
-            // Validasi input
-            $request->validate([
-                'barang_id' => 'required|array',
-                'barang_id.*' => 'exists:barangs,id',
-                'quantity' => 'required|array',
-                'quantity.*' => 'integer|min:1',
-            ]);
+        // Validasi input
+        $request->validate([
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'exists:barangs,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'integer|min:1',
+        ]);
 
-            $userId = Auth::id();
-            $checkedOutItems = [];
+        $userId = Auth::id();
+        $checkedOutItems = [];
 
-            foreach ($request->barang_id as $index => $barangId) {
-                $quantity = $request->quantity[$index] ?? 1;
+        foreach ($request->barang_id as $index => $barangId) {
+            $quantity = $request->quantity[$index] ?? 1;
 
-                $barang = Barang::find($barangId);
-                if (!$barang) {
-                    return response()->json(['message' => 'Barang not found'], 404);
-                }
+            $barang = Barang::find($barangId);
+            if (!$barang) {
+                return response()->json(['message' => 'Barang not found'], 404);
+            }
 
-                $totalPrice = $barang->harga * $quantity;
 
-                // Simpan item checkout ke dalam cart atau update jika sudah ada
-                $cartItem = Cart::updateOrCreate(
-                    [
-                        'user_id' => $userId,
-                        'barang_id' => $barangId,
-                    ],
-                    [
-                        'quantity' => $quantity,
-                        'total_price' => $totalPrice,
-                    ]
-                );
+            $totalPrice = $barang->harga * $quantity;
 
-                $avgRating = $barang->komentars()->avg('rating') ?? 0;
+            // Simpan item checkout ke dalam cart atau update jika sudah ada
+            $cartItem = Cart::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'barang_id' => $barangId,
+                ],
+                [
+                    'quantity' => $quantity,
+                    'total_price' => $totalPrice,
+                ]
+            );
 
-                $checkedOutItems[] = [
-                    'id' => $barang->id,
-                    'nama_barang' => $barang->nama_barang,
-                    'deskripsi' => $barang->deskripsi,
-                    'harga' => $barang->harga,
-                    'rating_barang' => $avgRating,
-                    'category_id' => $barang->category->id,
-                    'category_nama' => $barang->category->name,
-                    'image_barang' => $barang->image_barang,
-                    'status' => $barang->status_post,
-                    'stock' => $barang->stock_barang,
-                    'status_post' => $barang->status_post,
-                    'created_at' => $barang->created_at,
-                    'updated_at' => $barang->updated_at,
-                    'mitra' => [
-                        'id' => $barang->mitra->id,
-                        'nama_toko' => $barang->mitra->nama_toko ?? 'nama toko tidak tersedia',
-                        'nama_lengkap' => $barang->mitra->nama_lengkap,
-                        'jumlah_product' => $barang->mitra->jumlah_product,
-                        'jumlah_jasa' => $barang->mitra->jumlah_jasa,
-                        'pengikut' => $barang->mitra->pengikut,
-                        'penilaian' => $barang->mitra->penilaian,
-                        'no_whatsapp' => $barang->mitra->no_whatsapp,
+            $checkedOutItems[] = [
+                'id' => $barang->id,
+                'nama_barang' => $barang->nama_barang,
+                'deskripsi' => $barang->deskripsi,
+                'harga' => $barang->harga,
+                'rating_barang' => $avgRating,
+                'category_id' => $barang->category->id,
+                'category_nama' => $barang->category->name,
+                'image_barang' => $barang->image_barang,
+                'status' => $barang->status_post,
+                'stock' => $barang->stock_barang,
+                'status_post' => $barang->status_post,
+                'created_at' => $barang->created_at,
+                'updated_at' => $barang->updated_at,
+                'mitra' => [
+                    'id' => $barang->mitra->id,
+                    'nama_toko' => $barang->mitra->nama_toko ?? 'nama toko tidak tersedia',
+                    'nama_lengkap' => $barang->mitra->nama_lengkap,
+                    'jumlah_product' => $barang->mitra->jumlah_product,
+                    'jumlah_jasa' => $barang->mitra->jumlah_jasa,
+                    'pengikut' => $barang->mitra->pengikut,
+                    'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp' => $barang->mitra->no_whatsapp,
                     'email' => $barang->mitra->email,
-                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null // Menambahkan profile_image
                 ],
             ];
         }
 
-        return response()->json(['message' => 'Succesfully Checkout', 'checkedOutItems' => $checkedOutItems], 201);
+        return response()->json([
+            'message' => 'Checkout successful',
+            'checked_out_items' => $checkedOutItems
+        ], 200);
     }
-
 
 
 
