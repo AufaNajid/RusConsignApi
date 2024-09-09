@@ -192,6 +192,8 @@ class CartController extends Controller
                 ]
             );
 
+            $avgRating = $barang->ratings()->avg('rating') ?? 0;
+
             $checkedOutItems[] = [
                 'id' => $barang->id,
                 'nama_barang' => $barang->nama_barang,
