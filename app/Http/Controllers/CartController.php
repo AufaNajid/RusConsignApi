@@ -192,7 +192,34 @@ class CartController extends Controller
                 ]
             );
 
-            $checkedOutItems[] = $cartItem->load('barang.mitra');
+            $checkedOutItems[] = [
+                'id' => $barang->id,
+                'nama_barang' => $barang->nama_barang,
+                'deskripsi' => $barang->deskripsi,
+                'harga' => $barang->harga,
+                'rating_barang' => $avgRating,
+                'category_id' => $barang->category->id,
+                'category_nama' => $barang->category->name,
+                'image_barang' => $barang->image_barang,
+                'status' => $barang->status_post,
+                'stock' => $barang->stock_barang,
+                'quantity' => $quantities[$index],
+                'status_post' => $barang->status_post,
+                'created_at' => $barang->created_at,
+                'updated_at' => $barang->updated_at,
+                'mitra' => [
+                    'id' => $barang->mitra->id,
+                    'nama_toko' => $barang->mitra->nama_toko ?? 'nama toko tidak tersedia',
+                    'nama_lengkap' => $barang->mitra->nama_lengkap,
+                    'jumlah_product' => $barang->mitra->jumlah_product,
+                    'jumlah_jasa' => $barang->mitra->jumlah_jasa,
+                    'pengikut' => $barang->mitra->pengikut,
+                    'penilaian' => $barang->mitra->penilaian,
+                    'no_whatsapp' => $barang->mitra->no_whatsapp,
+                    'email' => $barang->mitra->email,
+                    'profile_image' => $barang->mitra->profileImage->image_profile ?? null
+                ],
+            ];
         }
 
         return response()->json(['message' => 'Succesfully Checkout', 'checkedOutItems' => $checkedOutItems], 201);
