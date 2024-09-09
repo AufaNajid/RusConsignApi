@@ -60,7 +60,7 @@ class ProfileController extends Controller
 
     public function allprofilebymitra($mitraId)
     {
-        $profiles = Profile::where('mitra_id', $mitraId)->get();
+        $profiles = ProfileImage::where('mitra_id', $mitraId)->get();
 
         // Periksa apakah ada profil
         if ($profiles->isEmpty()) {
