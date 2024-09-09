@@ -99,6 +99,7 @@ Route::group([
     Route::get('mitra/barang/{mitra_id}', [BarangController::class, 'getBarangsByMitraId']);
 
     Route::post('/create-invoice', [PaymentController::class, 'createInvoice']);
+    Route::post('/create-checkout', [PaymentController::class, 'createInvoicemultiple']);
     Route::post('/payments/webhook/xendit', [PaymentController::class, 'webhook']);
 
     Route::post('/profiles/image', [ProfileController::class, 'postImageProfile']);

@@ -64,6 +64,71 @@ class PaymentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function createInvoicemultiple(Request $request)
+    {
+        try {
+            $request->merge([
+                'barang_id' => json_decode($request->input('barang_id')),
+                'quantity' => json_decode($request->input('quantity')),
+            ]);
+
+            $validatedData = $request->validate([
+                'barang_id' => 'required|array',
+                'barang_id.*' => 'exists:barangs,id',
+                'quantity' => 'required|array',
+                'quantity.*' => 'integer|min:1',
+            ]);
+
+            $user = Auth::user();
+            $totalAmount = 0;
+            $orders = [];
+
+            foreach ($validatedData['barang_id'] as $index => $barangId) {
+                $quantity = $validatedData['quantity'][$index];
+                $barang = Barang::findOrFail($barangId);
+
+                $totalAmount += $barang->harga * $quantity;
+
+                $orders[] = [
+                    'barang_id' => $barangId,
+                    'user_id' => $user->id,
+                    'name_barang' => $barang->nama_barang,
+                    'quantity' => $quantity,
+                    'harga_barang' => $barang->harga,
+                    'grand_total' => $barang->harga * $quantity,
+                    'status' => 'progres',
+                ];
+            }
+
+            $no_transaction = 'Inv-' . uniqid();
+
+            $createdInvoice = [
+                'external_id' => $no_transaction,
+                'amount' => $totalAmount,
+                'payer_email' => $user->email,
+                'description' => 'Invoice for user ' . $user->name,
+            ];
+
+            $apiInstance = new InvoiceApi();
+            $generateInvoice = $apiInstance->createInvoice($createdInvoice);
+
+            if (!isset($generateInvoice['invoice_url'])) {
+                throw new \Exception('Invoice URL not found in the response');
+            }
+
+            foreach ($orders as &$order) {
+                $order['no_transaction'] = $no_transaction;
+                $order['external_id'] = $no_transaction;
+                $order['invoice_url'] = $generateInvoice['invoice_url'];
+                Payment::create($order);
+            }
+
+            return response()->json($generateInvoice, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function notificationCallback(Request $request)
     {
@@ -90,7 +155,6 @@ class PaymentController extends Controller
     public function webhook(Request $request)
     {
         try {
-            // Retrieve the invoice using the ID from the webhook request
             $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
 
             $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
