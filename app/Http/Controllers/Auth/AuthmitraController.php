@@ -37,7 +37,6 @@ class AuthmitraController extends Controller
 
         $profileImage = $mitra->profileImage ? $mitra->profileImage->image_profile : '';
 
-        // Format data mitra
         $mitraData = [
             'id' => $mitra->id,
             'nama_toko' => $mitra->nama_toko,

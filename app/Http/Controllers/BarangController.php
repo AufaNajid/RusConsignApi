@@ -29,7 +29,7 @@ class BarangController extends Controller
         $categoryId = $request->input('category_id');
 
         $query = Barang::where('mitra_id', $mitraId)
-            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp', 'mitra.profileImage');
+            ->with('category:id,name', 'mitra:id,nama_lengkap,nama_toko,jumlah_product,jumlah_jasa,pengikut,penilaian,no_whatsapp,email', 'mitra.profileImage');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);

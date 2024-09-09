@@ -81,7 +81,7 @@ Route::group([
     Route::post('/cart', [CartController::class, 'store']);
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
-    Route::post('/cart/select-item', [CartController::class, 'selectCartItems']);
+//    Route::post('/cart/select-item', [CartController::class, 'selectCartItems']);
     Route::post('/cart/checkout', [CartController::class, 'checkoutSelectedItems']);
 
     Route::get('allprofile', [ProfileController::class, 'allprofile']);
