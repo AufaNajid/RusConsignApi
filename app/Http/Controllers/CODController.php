@@ -65,7 +65,6 @@ class CODController extends Controller
 
     public function multiplebarang (Request $request)
     {
-        // Mengubah input JSON menjadi array
         $request->merge([
             'barang_id' => json_decode($request->input('barang_id')),
             'quantity' => json_decode($request->input('quantity')),
@@ -102,7 +101,7 @@ class CODController extends Controller
             // Membuat entri COD baru
             $cod = Cod::create([
                 'barang_id' => $barangId,
-                'lokasi_id' => $lokasiId,
+                'lokasi_id' => $validatedData['lokasi_id'],
                 'quantity' => $quantity,
                 'status_pembayaran' => 'belum_pembayaran',
                 'grand_total' => $totalAmount,
