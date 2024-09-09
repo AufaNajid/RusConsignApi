@@ -153,68 +153,47 @@ class CartController extends Controller
 
     public function checkoutSelectedItems(Request $request)
     {
-        // Mengambil input sebagai string dari query parameters
-        $barangIdsString = $request->query('barang_id');
-        $quantitiesString = $request->query('quantity');
-
-        // Memisahkan string menjadi array
-        $barangIds = explode(',', $barangIdsString);
-        $quantities = explode(',', $quantitiesString);
-
-        // Validasi input
-        $request->validate([
-            'barang_id' => 'required|array',
-            'barang_id.*' => 'required|integer|exists:barangs,id',
-            'quantity' => 'required|array',
-            'quantity.*' => 'required|integer|min:1',
+        $request->merge([
+            'barang_id' => json_decode($request->input('barang_id')),
+            'quantity' => json_decode($request->input('quantity')),
         ]);
 
-        // Memastikan panjang array barang_id dan quantity sama
-        if (count($barangIds) !== count($quantities)) {
-            return response()->json(['message' => 'Mismatched barang_id and quantity count'], 400);
-        }
+        $request->validate([
+            'barang_id' => 'required|array',
+            'barang_id.*' => 'exists:barangs,id',
+            'quantity' => 'required|array',
+            'quantity.*' => 'integer|min:1',
+        ]);
 
+        $userId = Auth::id();
         $checkedOutItems = [];
 
-        foreach ($barangIds as $index => $barangId) {
+        foreach ($request->barang_id as $index => $barangId) {
+            $quantity = $request->quantity[$index] ?? 1;
+
             $barang = Barang::find($barangId);
-
             if (!$barang) {
-                return response()->json(['message' => 'Barang not found for ID: ' . $barangId], 404);
+                return response()->json(['message' => 'Barang not found'], 404);
             }
 
-            $quantity = $quantities[$index];
+            $totalPrice = $barang->harga * $quantity;
 
-            if ($barang->stock_barang < $quantity) {
-                return response()->json(['message' => 'Insufficient stock for item: ' . $barang->nama_barang], 400);
-            }
+            $checkedOutItems = Cart::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'barang_id' => $barangId,
+                ],
+                [
+                    'quantity' => $quantity,
+                    'total_price' => $totalPrice,
+                ]
+            );
 
-            $barang->stock_barang -= $quantity;
-            $barang->save();
-
-            Cart::where('barang_id', $barangId)
-                ->where('user_id', Auth::id())
-                ->delete();
-
-            $checkedOutItems[] = [
-                'barang_id' => $barangId,
-                'nama_barang' => $barang->nama_barang,
-                'quantity' => $quantity,
-                'mitra' => $barang->mitra
-            ];
+            $checkedOutItems[] = $checkedOutItems->load('barang.mitra');
         }
 
-        if (empty($checkedOutItems)) {
-            return response()->json(['message' => 'No items checked out'], 400);
-        }
-
-        return response()->json([
-            'message' => 'Checkout successful',
-            'checked_out_items' => $checkedOutItems
-        ], 200);
+        return response()->json(['message' => 'Products added to cart', 'cartItems' => $cartItems], 201);
     }
-
-
 
 
 
