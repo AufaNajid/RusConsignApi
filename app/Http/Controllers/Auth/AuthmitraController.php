@@ -29,16 +29,13 @@ class AuthmitraController extends Controller
 
     public function show($id)
     {
-        // Cari barang berdasarkan ID
-        $barang = Barang::with('mitra.profileImage')->find($id);
+        // Cari mitra berdasarkan ID
+        $mitra = Mitra::with('profileImage')->find($id);
 
-        // Periksa apakah barang ditemukan
-        if (!$barang) {
-            return response()->json(['message' => 'Barang not found'], 404);
+        // Periksa apakah mitra ditemukan
+        if (!$mitra) {
+            return response()->json(['message' => 'Mitra not found'], 404);
         }
-
-        // Ambil mitra dari barang
-        $mitra = $barang->mitra;
 
         // Format data mitra
         $mitraData = [
@@ -59,6 +56,7 @@ class AuthmitraController extends Controller
             'mitra' => $mitraData,
         ], 200);
     }
+
 
     public function registermitra(Request $request)
     {
