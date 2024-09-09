@@ -192,7 +192,7 @@ class CartController extends Controller
                     ]
                 );
 
-                $avgRating = $barang->ratings()->avg('rating') ?? 0;
+                $avgRating = $barang->komentars()->avg('rating') ?? 0;
 
                 $checkedOutItems[] = [
                     'id' => $barang->id,
