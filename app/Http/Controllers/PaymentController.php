@@ -155,16 +155,27 @@ class PaymentController extends Controller
     public function webhook(Request $request)
     {
         try {
-            $getInvoice = \Xendit\Invoice\Invoice::retrieve($request->id);
+            // Validasi payload webhook
+            $validatedData = $request->validate([
+                'id' => 'required|string',
+                'external_id' => 'required|string',
+                'status' => 'required|string',
+            ]);
 
-            $payment = Payment::where('external_id', $request->external_id)->firstOrFail();
+            // Ambil data invoice dari Xendit berdasarkan ID
+            $getInvoice = \Xendit\Invoice\Invoice::retrieve($validatedData['id']);
 
+            // Cari payment berdasarkan external_id yang diterima
+            $payment = Payment::where('external_id', $validatedData['external_id'])->firstOrFail();
+
+            // Cek jika payment sudah diproses sebelumnya
             if ($payment->status == 'settled') {
                 return response()->json([
                     "data" => "Payment has already been processed"
                 ], 200);
             }
 
+            // Update status pembayaran berdasarkan status dari Xendit
             $payment->status = strtolower($getInvoice['status']);
             $payment->save();
 
@@ -172,7 +183,14 @@ class PaymentController extends Controller
                 "data" => "Payment status updated successfully"
             ], 200);
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Mengembalikan respon jika payment tidak ditemukan
+            return response()->json([
+                "error" => "Payment not found"
+            ], 404);
+
         } catch (\Exception $e) {
+            // Mengembalikan respon error umum
             return response()->json([
                 "error" => $e->getMessage()
             ], 500);
