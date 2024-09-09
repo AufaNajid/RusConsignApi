@@ -204,6 +204,7 @@ class CartController extends Controller
                 'image_barang' => $barang->image_barang,
                 'status' => $barang->status_post,
                 'stock' => $barang->stock_barang,
+                'quantity' =>$quantity,
                 'status_post' => $barang->status_post,
                 'created_at' => $barang->created_at,
                 'updated_at' => $barang->updated_at,
