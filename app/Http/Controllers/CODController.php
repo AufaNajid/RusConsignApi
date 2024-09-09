@@ -101,7 +101,7 @@ class CODController extends Controller
             // Membuat entri COD baru
             $cod = Cod::create([
                 'barang_id' => $barangId,
-                'lokasi_id' => $lokasi,
+                'lokasi_id' => $validatedData['lokasi_id'],
                 'quantity' => $quantity,
                 'status_pembayaran' => 'belum_pembayaran',
                 'grand_total' => $totalAmount,
