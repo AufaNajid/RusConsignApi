@@ -58,6 +58,21 @@ class ProfileController extends Controller
         ], 401);
     }
 
+    public function allprofilebymitra($mitraId)
+    {
+        $profiles = Profile::where('mitra_id', $mitraId)->get();
+
+        // Periksa apakah ada profil
+        if ($profiles->isEmpty()) {
+            return response()->json(['message' => 'No profiles found for this mitra'], 404);
+        }
+
+        // Kembalikan data profil dalam format JSON
+        return response()->json([
+            'message' => 'Profiles retrieved successfully',
+            'profiles' => $profiles,
+        ], 200);
+    }
 
     public function editProfile(Request $request)
     {
