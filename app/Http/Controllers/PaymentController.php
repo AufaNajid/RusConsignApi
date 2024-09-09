@@ -157,13 +157,9 @@ class PaymentController extends Controller
         try {
             // Validasi payload webhook
             $validatedData = $request->validate([
-                'id' => 'required|string',
                 'external_id' => 'required|string',
                 'status' => 'required|string',
             ]);
-
-            // Ambil data invoice dari Xendit berdasarkan ID
-            $getInvoice = \Xendit\Invoice\Invoice::retrieve($validatedData['id']);
 
             // Cari payment berdasarkan external_id yang diterima
             $payment = Payment::where('external_id', $validatedData['external_id'])->firstOrFail();
@@ -175,8 +171,8 @@ class PaymentController extends Controller
                 ], 200);
             }
 
-            // Update status pembayaran berdasarkan status dari Xendit
-            $payment->status = strtolower($getInvoice['status']);
+            // Update status pembayaran berdasarkan status dari webhook
+            $payment->status = strtolower($validatedData['status']);
             $payment->save();
 
             return response()->json([
