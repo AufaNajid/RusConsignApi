@@ -63,8 +63,9 @@ class CODController extends Controller
     }
 
 
-    public function multiplebarang(Request $request)
+    public function multiplebarang (Request $request)
     {
+        // Mengubah input JSON menjadi array
         $request->merge([
             'barang_id' => json_decode($request->input('barang_id')),
             'quantity' => json_decode($request->input('quantity')),
@@ -72,7 +73,7 @@ class CODController extends Controller
         ]);
 
         // Validasi input
-        $request->validate([
+        $validatedData = $request->validate([
             'barang_id' => 'required|array',
             'barang_id.*' => 'exists:barangs,id',
             'quantity' => 'required|array',
@@ -84,9 +85,9 @@ class CODController extends Controller
         $user = Auth::user();
         $cods = [];
 
-        foreach ($request->barang_id as $index => $barangId) {
-            $quantity = $request->quantity[$index] ?? 1;
-            $lokasiId = $request->lokasi_id[$index] ?? null;
+        foreach ($validatedData['barang_id'] as $index => $barangId) {
+            $quantity = $validatedData['quantity'][$index] ?? 1;
+            $lokasiId = $validatedData['lokasi_id'][$index] ?? null;
 
             $barang = Barang::findOrFail($barangId);
             $lokasi = Lokasi::findOrFail($lokasiId);
@@ -121,6 +122,7 @@ class CODController extends Controller
             'user' => $user
         ], 201);
     }
+
 
     public function updateStatus(Request $request, $id)
         {
