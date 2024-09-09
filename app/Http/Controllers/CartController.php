@@ -195,7 +195,7 @@ class CartController extends Controller
             $checkedOutItems[] = $cartItem->load('barang.mitra');
         }
 
-        return response()->json(['message' => 'Products added to cart', 'checkedOutItems' => $checkedOutItems], 201);
+        return response()->json(['message' => 'Succesfully Checkout', 'checkedOutItems' => $checkedOutItems], 201);
     }
 
 
