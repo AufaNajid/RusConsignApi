@@ -101,6 +101,7 @@ Route::group([
     Route::post('/create-invoice', [PaymentController::class, 'createInvoice']);
     Route::post('/create-checkout', [PaymentController::class, 'createInvoicemultiple']);
     Route::post('/payments/webhook/xendit', [PaymentController::class, 'webhook']);
+    Route::get('/payments/status/{status}', [PaymentController::class, 'getPaymentsByStatus']);
 
     Route::post('/profiles/image', [ProfileController::class, 'postImageProfile']);
     Route::post('/profile/image/{id}', [ProfileController::class, 'editImageProfile']);

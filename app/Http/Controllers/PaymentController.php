@@ -155,24 +155,26 @@ class PaymentController extends Controller
     public function webhook(Request $request)
     {
         try {
-            // Validasi payload webhook
             $validatedData = $request->validate([
                 'external_id' => 'required|string',
                 'status' => 'required|string',
             ]);
 
-            // Cari payment berdasarkan external_id yang diterima
             $payment = Payment::where('external_id', $validatedData['external_id'])->firstOrFail();
 
-            // Cek jika payment sudah diproses sebelumnya
             if ($payment->status == 'settled') {
                 return response()->json([
                     "data" => "Payment has already been processed"
                 ], 200);
             }
 
-            // Update status pembayaran berdasarkan status dari webhook
-            $payment->status = strtolower($validatedData['status']);
+            // Cek status dari webhook dan ubah statusnya
+            if (strtolower($validatedData['status']) == 'paid') {
+                $payment->status = 'selesai';
+            } else {
+                $payment->status = strtolower($validatedData['status']);
+            }
+
             $payment->save();
 
             return response()->json([
@@ -180,16 +182,31 @@ class PaymentController extends Controller
             ], 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Mengembalikan respon jika payment tidak ditemukan
             return response()->json([
                 "error" => "Payment not found"
             ], 404);
 
         } catch (\Exception $e) {
-            // Mengembalikan respon error umum
             return response()->json([
                 "error" => $e->getMessage()
             ], 500);
         }
     }
+
+
+    public function getPaymentsByStatus($status)
+    {
+        try {
+            $payments = Payment::where('status', $status)->get();
+
+            if ($payments->isEmpty()) {
+                return response()->json(['message' => 'No payments found for the given status'], 404);
+            }
+
+            return response()->json($payments, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 }
