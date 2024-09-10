@@ -209,50 +209,50 @@ class PaymentController extends Controller
 
             $detailedPayments = $payments->map(function($payment) {
                 $barang = $payment->barang;
-                $mitra = $barang ? $barang->mitra : null;
-                $category = $barang ? $barang->category : null;
+                $mitra = $barang->mitra ?? null;
+                $category = $barang->category ?? null;
 
                 return [
                     'id' => $payment->id,
                     'barang' => $barang ? [
-                        'id' => $barang->id,
-                        'nama_barang' => $barang->nama_barang,
-                        'deskripsi' => $barang->deskripsi,
-                        'harga' => $barang->harga,
+                        'id' => $barang->id ?? null,
+                        'nama_barang' => $barang->nama_barang ?? null,
+                        'deskripsi' => $barang->deskripsi ?? null,
+                        'harga' => $barang->harga ?? null,
                         'rating_barang' => $barang->rating_barang ?? null,
-                        'category_id' => $category->id ?? null,
-                        'category_nama' => $category->name ?? null,
-                        'image_barang' => $barang->image_barang,
-                        'status' => $barang->status_post,
-                        'stock' => $barang->stock_barang,
-                        'quantity' => $barang->quantity,
-                        'created_at' => $barang->created_at,
-                        'updated_at' => $barang->updated_at,
+                        'category_id' => $category ? $category->id : null,
+                        'category_nama' => $category ? $category->name : null,
+                        'image_barang' => $barang->image_barang ?? null,
+                        'status' => $barang->status_post ?? null,
+                        'stock' => $barang->stock_barang ?? null,
+                        'quantity' => $barang->quantity ?? null,
+                        'created_at' => $barang->created_at ?? null,
+                        'updated_at' => $barang->updated_at ?? null,
                         'mitra' => $mitra ? [
-                            'id' => $mitra->id,
-                            'nama_toko' => $mitra->nama_toko,
-                            'nama_lengkap' => $mitra->nama_lengkap,
-                            'jumlah_product' => $mitra->jumlah_product,
-                            'jumlah_jasa' => $mitra->jumlah_jasa,
-                            'pengikut' => $mitra->pengikut,
-                            'penilaian' => $mitra->penilaian,
-                            'no_whatsapp' => $mitra->no_whatsapp,
+                            'id' => $mitra->id ?? null,
+                            'nama_toko' => $mitra->nama_toko ?? null,
+                            'nama_lengkap' => $mitra->nama_lengkap ?? null,
+                            'jumlah_product' => $mitra->jumlah_product ?? null,
+                            'jumlah_jasa' => $mitra->jumlah_jasa ?? null,
+                            'pengikut' => $mitra->pengikut ?? null,
+                            'penilaian' => $mitra->penilaian ?? null,
+                            'no_whatsapp' => $mitra->no_whatsapp ?? null,
                             'profile_image' => $mitra->profileImage->image_profile ?? null
                         ] : null,
                     ] : null,
                     'user' => [
-                        'id' => $payment->user->id,
-                        'name' => $payment->user->name,
-                        'email' => $payment->user->email,
+                        'id' => $payment->user->id ?? null,
+                        'name' => $payment->user->name ?? null,
+                        'email' => $payment->user->email ?? null,
                     ],
-                    'external_id' => $payment->external_id,
-                    'no_transaction' => $payment->no_transaction,
-                    'quantity' => $payment->quantity,
-                    'invoice_url' => $payment->invoice_url,
-                    'grand_total' => $payment->grand_total,
-                    'status' => $payment->status,
-                    'created_at' => $payment->created_at,
-                    'updated_at' => $payment->updated_at,
+                    'external_id' => $payment->external_id ?? null,
+                    'no_transaction' => $payment->no_transaction ?? null,
+                    'quantity' => $payment->quantity ?? null,
+                    'invoice_url' => $payment->invoice_url ?? null,
+                    'grand_total' => $payment->grand_total ?? null,
+                    'status' => $payment->status ?? null,
+                    'created_at' => $payment->created_at ?? null,
+                    'updated_at' => $payment->updated_at ?? null,
                 ];
             });
 
@@ -261,6 +261,7 @@ class PaymentController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
 
     public function getPaymentsByStatus($role, $status, $id, Request $request)
