@@ -207,18 +207,18 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
-            $rate = Komentar::select(
-                DB::raw('count(1) as total'),
-                'rate'
-            )
-                ->where('barang_id', $barang->id)
-                ->groupBy('rate')
-                ->get();
-
-            $total = $rate->sum('total');
-            $avg = $rate->reduce(function ($carry, $item) {
-                    return $carry + ($item->total * $item->rate);
-                }, 0) / ($total ?: 1);
+//            $rate = Komentar::select(
+//                DB::raw('count(1) as total'),
+//                'rate'
+//            )
+//                ->where('barang_id', $barang->id)
+//                ->groupBy('rate')
+//                ->get();
+//
+//            $total = $rate->sum('total');
+//            $avg = $rate->reduce(function ($carry, $item) {
+//                    return $carry + ($item->total * $item->rate);
+//                }, 0) / ($total ?: 1);
 
             $detailedPayments = $payments->map(function($payment) {
                 return [
