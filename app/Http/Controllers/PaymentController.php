@@ -197,16 +197,44 @@ class PaymentController extends Controller
     public function getPaymentsByStatus($status)
     {
         try {
-            $payments = Payment::where('status', $status)->get();
+            $payments = Payment::where('status', $status)
+                ->with(['barang', 'user']) // Memuat relasi barang dan user
+                ->get();
 
             if ($payments->isEmpty()) {
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
-            return response()->json($payments, 200);
+            $detailedPayments = $payments->map(function($payment) {
+                return [
+                    'id' => $payment->id,
+                    'barang' => [
+                        'id' => $payment->barang->id,
+                        'nama_barang' => $payment->barang->nama_barang,
+                        'harga_barang' => $payment->barang->harga,
+                    ],
+                    'user' => [
+                        'id' => $payment->user->id,
+                        'name' => $payment->user->name,
+                        'email' => $payment->user->email,
+                    ],
+                    'external_id' => $payment->external_id,
+                    'no_transaction' => $payment->no_transaction,
+                    'quantity' => $payment->quantity,
+                    'invoice_url' => $payment->invoice_url,
+                    'grand_total' => $payment->grand_total,
+                    'status' => $payment->status,
+                    'payment_method' => $payment->payment_method, // Jika ada kolom payment_method
+                    'created_at' => $payment->created_at,
+                    'updated_at' => $payment->updated_at,
+                ];
+            });
+
+            return response()->json($detailedPayments, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
 }
