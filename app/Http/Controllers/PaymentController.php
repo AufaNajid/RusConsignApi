@@ -363,7 +363,11 @@ class PaymentController extends Controller
                 ];
             });
 
-            return response()->json($detailedPayments, 200);
+            return response()->json([
+                'role'=>$role,
+                'status'=>$status,
+                'payments'=>$detailedPayments,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
