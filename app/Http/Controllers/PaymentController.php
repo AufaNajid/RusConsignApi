@@ -200,7 +200,7 @@ class PaymentController extends Controller
     {
         try {
             $payments = Payment::where('status', $status)
-                ->with(['barang.mitra', 'barang.category', 'user']) // Memuat relasi barang, mitra, category, dan user
+                ->with(['barang.mitra', 'barang.category', 'user'])
                 ->get();
 
             if ($payments->isEmpty()) {
