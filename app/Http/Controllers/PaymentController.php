@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Komentar;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Xendit\Configuration;
 use Xendit\Invoice\InvoiceApi;
@@ -205,13 +207,47 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
+            $rate = Komentar::select(
+                DB::raw('count(1) as total'),
+                'rate'
+            )
+                ->where('barang_id', $barang->id)
+                ->groupBy('rate')
+                ->get();
+
+            $total = $rate->sum('total');
+            $avg = $rate->reduce(function ($carry, $item) {
+                    return $carry + ($item->total * $item->rate);
+                }, 0) / ($total ?: 1);
+
             $detailedPayments = $payments->map(function($payment) {
                 return [
                     'id' => $payment->id,
                     'barang' => [
-                        'id' => $payment->barang->id,
-                        'nama_barang' => $payment->barang->nama_barang,
-                        'harga_barang' => $payment->barang->harga,
+                        'id' => $payment-> barang->id,
+                        'nama_barang' => $payment-> barang->nama_barang,
+                        'deskripsi' =>$payment-> barang->deskripsi,
+                        'harga' =>$payment-> barang->harga,
+                        'rating_barang' =>$payment-> $rate,
+                        'category_id' =>$payment->barang->category->id,
+                        'category_nama' =>$payment-> barang->category->name,
+                        'image_barang' =>$payment-> barang->image_barang,
+                        'status' =>$payment-> barang->status_post,
+                        'stock' =>$payment-> barang->stock_barang,
+                        'quantity' =>$payment-> barang->quantity,
+                        'created_at' =>$payment-> barang->created_at,
+                        'updated_at' =>$payment-> barang->updated_at,
+                        'mitra' => [
+                            'id' => $payment->barang->mitra->id,
+                            'nama_toko' =>$payment-> barang->mitra->nama_toko,
+                            'nama_lengkap' => $payment->barang->mitra->nama_lengkap,
+                            'jumlah_product' => $payment->barang->mitra->jumlah_product,
+                            'jumlah_jasa' =>$payment-> barang->mitra->jumlah_jasa,
+                            'pengikut' => $payment->barang->mitra->pengikut,
+                            'penilaian' => $payment->barang->mitra->penilaian,
+                            'no_whatsapp'=> $payment->barang->mitra->no_whatsapp,
+                            'profile_image' => $payment->barang->mitra->profileImage->image_profile ?? null
+                        ],
                     ],
                     'user' => [
                         'id' => $payment->user->id,
@@ -224,11 +260,11 @@ class PaymentController extends Controller
                     'invoice_url' => $payment->invoice_url,
                     'grand_total' => $payment->grand_total,
                     'status' => $payment->status,
-//                    'payment_method' => $payment->payment_method,
                     'created_at' => $payment->created_at,
                     'updated_at' => $payment->updated_at,
                 ];
             });
+
 
             return response()->json($detailedPayments, 200);
         } catch (\Exception $e) {
