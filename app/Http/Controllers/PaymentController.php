@@ -228,7 +228,7 @@ class PaymentController extends Controller
                         'nama_barang' => $payment-> barang->nama_barang,
                         'deskripsi' =>$payment-> barang->deskripsi,
                         'harga' =>$payment-> barang->harga,
-                        'rating_barang' =>$payment-> $rate,
+//                        'rating_barang' =>$payment-> $rate,
                         'category_id' =>$payment->barang->category->id,
                         'category_nama' =>$payment-> barang->category->name,
                         'image_barang' =>$payment-> barang->image_barang,
