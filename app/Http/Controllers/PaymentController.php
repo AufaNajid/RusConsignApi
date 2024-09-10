@@ -200,55 +200,46 @@ class PaymentController extends Controller
     {
         try {
             $payments = Payment::where('status', $status)
-                ->with(['barang', 'user']) // Memuat relasi barang dan user
+                ->with(['barang.mitra', 'barang.category', 'user']) // Memuat relasi barang, mitra, category, dan user
                 ->get();
 
             if ($payments->isEmpty()) {
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
-//            $rate = Komentar::select(
-//                DB::raw('count(1) as total'),
-//                'rate'
-//            )
-//                ->where('barang_id', $barang->id)
-//                ->groupBy('rate')
-//                ->get();
-//
-//            $total = $rate->sum('total');
-//            $avg = $rate->reduce(function ($carry, $item) {
-//                    return $carry + ($item->total * $item->rate);
-//                }, 0) / ($total ?: 1);
-
             $detailedPayments = $payments->map(function($payment) {
+                $barang = $payment->barang;
+                $mitra = $barang ? $barang->mitra : null;
+                $category = $barang ? $barang->category : null;
+
                 return [
                     'id' => $payment->id,
-                    'barang' => [
-                        'id' => $payment-> barang->id,
-                        'nama_barang' => $payment-> barang->nama_barang,
-                        'deskripsi' =>$payment-> barang->deskripsi,
-                        'harga' =>$payment-> barang->harga,
-//                        'rating_barang' =>$payment-> $rate,
-                        'category_id' =>$payment->barang->category->id,
-                        'category_nama' =>$payment-> barang->category->name,
-                        'image_barang' =>$payment-> barang->image_barang,
-                        'status' =>$payment-> barang->status_post,
-                        'stock' =>$payment-> barang->stock_barang,
-                        'quantity' =>$payment-> barang->quantity,
-                        'created_at' =>$payment-> barang->created_at,
-                        'updated_at' =>$payment-> barang->updated_at,
-                        'mitra' => [
-                            'id' => $payment->barang->mitra->id,
-                            'nama_toko' =>$payment-> barang->mitra->nama_toko,
-                            'nama_lengkap' => $payment->barang->mitra->nama_lengkap,
-                            'jumlah_product' => $payment->barang->mitra->jumlah_product,
-                            'jumlah_jasa' =>$payment-> barang->mitra->jumlah_jasa,
-                            'pengikut' => $payment->barang->mitra->pengikut,
-                            'penilaian' => $payment->barang->mitra->penilaian,
-                            'no_whatsapp'=> $payment->barang->mitra->no_whatsapp,
-                            'profile_image' => $payment->barang->mitra->profileImage->image_profile ?? null
-                        ],
-                    ],
+                    'barang' => $barang ? [
+                        'id' => $barang->id,
+                        'nama_barang' => $barang->nama_barang,
+                        'deskripsi' => $barang->deskripsi,
+                        'harga' => $barang->harga,
+                        'rating_barang' => $barang->rating_barang ?? null,
+                        'category_id' => $category->id ?? null,
+                        'category_nama' => $category->name ?? null,
+                        'image_barang' => $barang->image_barang,
+                        'status' => $barang->status_post,
+                        'stock' => $barang->stock_barang,
+                        'quantity' => $barang->quantity,
+                        'created_at' => $barang->created_at,
+                        'updated_at' => $barang->updated_at,
+                        'mitra' => $mitra ? [
+                            'id' => $mitra->id,
+                            'nama_toko' => $mitra->nama_toko,
+                            'nama_lengkap' => $mitra->nama_lengkap,
+                            'jumlah_product' => $mitra->jumlah_product,
+                            'jumlah_jasa' => $mitra->jumlah_jasa,
+                            'pengikut' => $mitra->pengikut,
+                            'penilaian' => $mitra->penilaian,
+                            'no_whatsapp' => $mitra->no_whatsapp,
+                            'profile_image' => $mitra->profileImage->image_profile ?? null
+                        ] : null,
+                    ] : null,
                     'user' => [
                         'id' => $payment->user->id,
                         'name' => $payment->user->name,
@@ -265,12 +256,12 @@ class PaymentController extends Controller
                 ];
             });
 
-
             return response()->json($detailedPayments, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
     public function getPaymentsByStatus($role, $status, $id, Request $request)
     {
