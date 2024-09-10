@@ -290,6 +290,7 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'Invalid payment status'], 400);
             }
 
+            // Buat query dasar berdasarkan status
             $query = Payment::where('status', $status);
 
             // Filter berdasarkan user_id jika role adalah 'user'
@@ -304,14 +305,15 @@ class PaymentController extends Controller
                 });
             }
 
-            $payments = Payment::where('status', $status)
-                ->with(['barang.mitra', 'barang.category', 'user']) // Memuat relasi barang, mitra, category, dan user
-                ->get();
+            // Muat relasi barang, mitra, category, dan user
+            $payments = $query->with(['barang.mitra', 'barang.category', 'user'])->get();
 
+            // Cek apakah ada pembayaran yang ditemukan
             if ($payments->isEmpty()) {
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
+            // Mapping hasil data menjadi array detail
             $detailedPayments = $payments->map(function($payment) {
                 $barang = $payment->barang;
                 $mitra = $barang->mitra ?? null;
@@ -319,6 +321,14 @@ class PaymentController extends Controller
 
                 return [
                     'id' => $payment->id,
+                    'external_id' => $payment->external_id ?? null,
+                    'no_transaction' => $payment->no_transaction ?? null,
+                    'quantity' => $payment->quantity ?? null,
+                    'invoice_url' => $payment->invoice_url ?? null,
+                    'grand_total' => $payment->grand_total ?? null,
+                    'status' => $payment->status ?? null,
+                    'created_at' => $payment->created_at ?? null,
+                    'updated_at' => $payment->updated_at ?? null,
                     'barang' => $barang ? [
                         'id' => $barang->id ?? null,
                         'nama_barang' => $barang->nama_barang ?? null,
@@ -350,20 +360,14 @@ class PaymentController extends Controller
                         'name' => $payment->user->name ?? null,
                         'email' => $payment->user->email ?? null,
                     ],
-                    'external_id' => $payment->external_id ?? null,
-                    'no_transaction' => $payment->no_transaction ?? null,
-                    'quantity' => $payment->quantity ?? null,
-                    'invoice_url' => $payment->invoice_url ?? null,
-                    'grand_total' => $payment->grand_total ?? null,
-                    'status' => $payment->status ?? null,
-                    'created_at' => $payment->created_at ?? null,
-                    'updated_at' => $payment->updated_at ?? null,
                 ];
             });
+
             return response()->json($detailedPayments, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
 }
