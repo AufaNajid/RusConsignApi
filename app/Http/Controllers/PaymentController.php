@@ -194,7 +194,7 @@ class PaymentController extends Controller
     }
 
 
-    public function getPaymentsByStatus($status)
+    public function getallByStatus($status)
     {
         try {
             $payments = Payment::where('status', $status)
@@ -224,7 +224,7 @@ class PaymentController extends Controller
                     'invoice_url' => $payment->invoice_url,
                     'grand_total' => $payment->grand_total,
                     'status' => $payment->status,
-                    'payment_method' => $payment->payment_method, // Jika ada kolom payment_method
+//                    'payment_method' => $payment->payment_method,
                     'created_at' => $payment->created_at,
                     'updated_at' => $payment->updated_at,
                 ];
@@ -236,5 +236,68 @@ class PaymentController extends Controller
         }
     }
 
+    public function getPaymentsByStatus($role, $status, $id, Request $request)
+    {
+        try {
+            // Validasi role
+            if (!in_array($role, ['user', 'mitra'])) {
+                return response()->json(['message' => 'Invalid role'], 400);
+            }
+
+            // Validasi status
+            if (!in_array($status, ['belum_pembayaran', 'progres', 'selesai', 'batal_pesanan'])) {
+                return response()->json(['message' => 'Invalid payment status'], 400);
+            }
+
+            $query = Payment::where('status', $status);
+
+            // Filter berdasarkan user_id jika role adalah 'user'
+            if ($role === 'user') {
+                $query->where('user_id', $id);
+            }
+
+            // Filter berdasarkan mitra_id jika role adalah 'mitra'
+            if ($role === 'mitra') {
+                $query->whereHas('barang', function($q) use ($id) {
+                    $q->where('mitra_id', $id);
+                });
+            }
+
+            $payments = $query->with(['barang', 'user'])->get();
+
+            if ($payments->isEmpty()) {
+                return response()->json(['message' => 'No payments found for the given status'], 404);
+            }
+
+            $detailedPayments = $payments->map(function($payment) {
+                return [
+                    'id' => $payment->id,
+                    'barang' => [
+                        'id' => $payment->barang->id,
+                        'nama_barang' => $payment->barang->nama_barang,
+                        'harga_barang' => $payment->barang->harga,
+                        'rating_barang' => $payment->barang->rating,
+                    ],
+                    'user' => [
+                        'id' => $payment->user->id,
+                        'name' => $payment->user->name,
+                        'email' => $payment->user->email,
+                    ],
+                    'external_id' => $payment->external_id,
+                    'no_transaction' => $payment->no_transaction,
+                    'quantity' => $payment->quantity,
+                    'invoice_url' => $payment->invoice_url,
+                    'grand_total' => $payment->grand_total,
+                    'status' => $payment->status,
+                    'created_at' => $payment->created_at,
+                    'updated_at' => $payment->updated_at,
+                ];
+            });
+
+            return response()->json($detailedPayments, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 }
