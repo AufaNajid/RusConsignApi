@@ -212,6 +212,19 @@ class PaymentController extends Controller
                 $mitra = $barang->mitra ?? null;
                 $category = $barang->category ?? null;
 
+                $rate = Komentar::select(
+                    DB::raw('count(1) as total'),
+                    'rate'
+                )
+                    ->where('barang_id', $barang->id)
+                    ->groupBy('rate')
+                    ->get();
+
+                $total = $rate->sum('total');
+                $avg = $rate->reduce(function ($carry, $item) {
+                        return $carry + ($item->total * $item->rate);
+                    }, 0) / ($total ?: 1);
+
                 return [
                     'id' => $payment->id,
                     'barang' => $barang ? [
@@ -219,7 +232,7 @@ class PaymentController extends Controller
                         'nama_barang' => $barang->nama_barang ?? null,
                         'deskripsi' => $barang->deskripsi ?? null,
                         'harga' => $barang->harga ?? null,
-                        'rating_barang' => $barang->rating_barang ?? null,
+                        'rating_barang' => $barang->$avg ?? null,
                         'category_id' => $category ? $category->id : null,
                         'category_nama' => $category ? $category->name : null,
                         'image_barang' => $barang->image_barang ?? null,
