@@ -291,37 +291,62 @@ class PaymentController extends Controller
                 });
             }
 
-            $payments = $query->with(['barang', 'user'])->get();
+            $payments = Payment::where('status', $status)
+                ->with(['barang.mitra', 'barang.category', 'user']) // Memuat relasi barang, mitra, category, dan user
+                ->get();
 
             if ($payments->isEmpty()) {
                 return response()->json(['message' => 'No payments found for the given status'], 404);
             }
 
             $detailedPayments = $payments->map(function($payment) {
+                $barang = $payment->barang;
+                $mitra = $barang->mitra ?? null;
+                $category = $barang->category ?? null;
+
                 return [
                     'id' => $payment->id,
-                    'barang' => [
-                        'id' => $payment->barang->id,
-                        'nama_barang' => $payment->barang->nama_barang,
-                        'harga_barang' => $payment->barang->harga,
-                        'rating_barang' => $payment->barang->rating,
-                    ],
+                    'barang' => $barang ? [
+                        'id' => $barang->id ?? null,
+                        'nama_barang' => $barang->nama_barang ?? null,
+                        'deskripsi' => $barang->deskripsi ?? null,
+                        'harga' => $barang->harga ?? null,
+                        'rating_barang' => $barang->rating_barang ?? null,
+                        'category_id' => $category ? $category->id : null,
+                        'category_nama' => $category ? $category->name : null,
+                        'image_barang' => $barang->image_barang ?? null,
+                        'status' => $barang->status_post ?? null,
+                        'stock' => $barang->stock_barang ?? null,
+                        'quantity' => $barang->quantity ?? null,
+                        'created_at' => $barang->created_at ?? null,
+                        'updated_at' => $barang->updated_at ?? null,
+                        'mitra' => $mitra ? [
+                            'id' => $mitra->id ?? null,
+                            'nama_toko' => $mitra->nama_toko ?? null,
+                            'nama_lengkap' => $mitra->nama_lengkap ?? null,
+                            'jumlah_product' => $mitra->jumlah_product ?? null,
+                            'jumlah_jasa' => $mitra->jumlah_jasa ?? null,
+                            'pengikut' => $mitra->pengikut ?? null,
+                            'penilaian' => $mitra->penilaian ?? null,
+                            'no_whatsapp' => $mitra->no_whatsapp ?? null,
+                            'profile_image' => $mitra->profileImage->image_profile ?? null
+                        ] : null,
+                    ] : null,
                     'user' => [
-                        'id' => $payment->user->id,
-                        'name' => $payment->user->name,
-                        'email' => $payment->user->email,
+                        'id' => $payment->user->id ?? null,
+                        'name' => $payment->user->name ?? null,
+                        'email' => $payment->user->email ?? null,
                     ],
-                    'external_id' => $payment->external_id,
-                    'no_transaction' => $payment->no_transaction,
-                    'quantity' => $payment->quantity,
-                    'invoice_url' => $payment->invoice_url,
-                    'grand_total' => $payment->grand_total,
-                    'status' => $payment->status,
-                    'created_at' => $payment->created_at,
-                    'updated_at' => $payment->updated_at,
+                    'external_id' => $payment->external_id ?? null,
+                    'no_transaction' => $payment->no_transaction ?? null,
+                    'quantity' => $payment->quantity ?? null,
+                    'invoice_url' => $payment->invoice_url ?? null,
+                    'grand_total' => $payment->grand_total ?? null,
+                    'status' => $payment->status ?? null,
+                    'created_at' => $payment->created_at ?? null,
+                    'updated_at' => $payment->updated_at ?? null,
                 ];
             });
-
             return response()->json($detailedPayments, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
