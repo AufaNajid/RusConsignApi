@@ -143,6 +143,7 @@ Route::get("index",[AuthController::class,"index"]);
 Route::get('lokasi', [\App\Http\Controllers\LokasiController::class, 'index']);
 Route::get('/lokasi/{id}', [\App\Http\Controllers\LokasiController::class, 'show']);
 Route::post('add-lokasi', [\App\Http\Controllers\LokasiController::class, 'lokasi']);
+Route::put('/edit-lokasi/{id}', [\App\Http\Controllers\LokasiController::class, 'edit']);
 
 
 
