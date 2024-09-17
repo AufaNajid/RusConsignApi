@@ -254,12 +254,10 @@ class CODController extends Controller
     }
     public function getAllByStatus($status)
     {
-        // Validasi status
         if (!in_array($status, ['belum_pembayaran', 'progres', 'selesai', 'batal_pesanan'])) {
             return response()->json(['message' => 'Status pembayaran tidak valid'], 400);
         }
 
-        // Mengambil semua data COD berdasarkan status
         $cods = Cod::where('status_pembayaran', $status)
             ->with(['barang', 'lokasi.mitra', 'user'])
             ->get();

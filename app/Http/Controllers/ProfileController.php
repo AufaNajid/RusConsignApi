@@ -62,12 +62,11 @@ class ProfileController extends Controller
     {
         $profiles = ProfileImage::where('mitra_id', $mitraId)->get();
 
-        // Periksa apakah ada profil
+
         if ($profiles->isEmpty()) {
             return response()->json(['message' => 'No profiles found for this mitra'], 404);
         }
 
-        // Kembalikan data profil dalam format JSON
         return response()->json([
             'message' => 'Profiles retrieved successfully',
             'profiles' => $profiles,
@@ -81,7 +80,6 @@ class ProfileController extends Controller
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        // Validasi data yang diterima
         $validatedData = $request->validate([
             'name' => 'sometimes|string|max:255',
             'bio_desc' => 'sometimes|string',
@@ -89,7 +87,6 @@ class ProfileController extends Controller
             'nama_toko' => 'sometimes|string|max:255'
         ]);
 
-        // Update data user
         if (isset($validatedData['name'])) {
             $user->name = $validatedData['name'];
         }
@@ -97,11 +94,9 @@ class ProfileController extends Controller
             $user->bio_desc = $validatedData['bio_desc'];
         }
 
-        // Update atau tambahkan profile image
         if (isset($validatedData['image_profile'])) {
             $profileImage = $user->profileImages()->first();
             if ($profileImage) {
-                // Hapus gambar lama jika ada
                 if (Storage::exists($profileImage->image_profile)) {
                     Storage::delete($profileImage->image_profile);
                 }

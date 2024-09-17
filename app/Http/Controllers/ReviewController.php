@@ -69,8 +69,8 @@ class ReviewController extends Controller
         'message' => 'Komentar berhasil disimpan!',
             'data' => [
                 'komentar' => $komentar,
-                'user' => $komentar->user, // Include user profile
+                'user' => $komentar->user,
             ]
-    ], 201); // 201 Created status code
+    ], 201);
 }
 }
